@@ -7,7 +7,7 @@ It uses [**ImageMagick**](https://imagemagick.org/) to perform the conversions.
 
 First, make sure you install [**ImageMagick**](https://imagemagick.org/script/download.php) in your system.
 You'll also need to install [**python**](https://www.python.org/downloads/)
-and [**git**](https://git-scm.com/downloads) if you don't already have them installed in your system.
+and [**git**](https://git-scm.com/downloads) if you don't already have them installed.
 
 With everything ready, run either of the following commands in the command-line interface, according to your OS:
 
@@ -32,9 +32,6 @@ it will save the results in the last directory you provide. For example, supposi
 ```
 tsto2rgb path/to/img_dir path/to/destination
 ```
-
-The rgb files will be saved in subdirectories within the destination directory.
-
 ## Arguments
 
 If you prefer to use a different type of image instead of png, you can use the --input_extension argument.
