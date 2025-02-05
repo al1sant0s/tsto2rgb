@@ -77,7 +77,11 @@ def main():
     )
 
     if total == 0:
-        raise Exception(f"No {args.input_extension} files found in the specified directories.")
+        print("[No file(s) found!]\n\n")
+        print(f"Warning! No {args.input_extension} files found in the specified directories.")
+        print("Remember you should specify the directories where the files are, not the files themselves.")
+        print("If you need help, execute the following command: tsto2rgb --help\n\n")
+        return
 
     print(f"[{total} file(s) found!]\n\n")
 
