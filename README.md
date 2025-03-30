@@ -20,6 +20,8 @@ python -m pip install tsto2rgb@git+https://github.com/al1sant0s/tsto2rgb
 python3 -m pip install tsto2rgb@git+https://github.com/al1sant0s/tsto2rgb
 ```
 
+If you use windows I recommend you to get the modern [windows terminal from microsoft store](https://apps.microsoft.com/detail/9n0dx20hk701?hl).
+
 ## Usage
 
 ```
@@ -40,7 +42,7 @@ If you prefer to use a different type of image instead of png, you can use the -
 tsto2rgb --input_extension webp path/to/img_dir path/to/destination
 ```
 
-You can also choose the depth of the image. Choose between 4 (default) or 8 bits per channel.
+You can also choose the depth of the image. Choose between 4 (default for in-game sprites) or 8 bits (e.g. a splashscreen) per channel.
 
 ```
 tsto2rgb --depth 8 path/to/img_dir path/to/destination
