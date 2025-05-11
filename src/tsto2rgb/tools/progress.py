@@ -1,5 +1,9 @@
-def report_progress(prefix_str, parsing_info):
+from tsto2rgb.parsers.styles import colorprint
+
+def report_progress(prefix_str, parsing_info, style):
     # Clear line.
+    #colorprint(style, 150 * " ", end="\r")
     print(150 * " ", end="\r")
+
     # Print progress.
-    print(f"{prefix_str} {parsing_info}", end="\r")
+    colorprint(style, f"{prefix_str} {parsing_info}", end="\r")

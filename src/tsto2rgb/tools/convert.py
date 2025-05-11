@@ -1,11 +1,10 @@
 import argparse
 from pathlib import Path
-from wand.image import Image
-from tsto2rgb.tools.progress import report_progress
-
-
-def progress_str(n, total, filestem, extension):
-    return f"Progress ({n * 100 / total:.2f}%) : [{total - n} file(s) left] ---> {filestem}.{extension}"
+from colorama import init
+from tsto2rgb.parsers import rgb
+from tsto2rgb.parsers.styles import styles, colorprint
+from tsto2rgb.parsers.rgb import rgb_gen
+from tsto2rgb.parsers.bsv import bsv_gen
 
 
 # Warning: this script requires ImageMagick to work. If you do not have installed in your system,
@@ -13,9 +12,12 @@ def progress_str(n, total, filestem, extension):
 
 
 def main():
+
+    init()
+
     parser = argparse.ArgumentParser(
         description="""
-        This tool allows you to convert images back to the raw RGB file format used in the game 'The Simpsons: Tapped Out'.
+        This tool allows you to convert images to rgb, bsv3 and bcell custom formats for usage in the game 'The Simpsons: Tapped Out'.
         It uses ImageMagick to perform the conversions, so make sure you have it installed in your system.
         Multiple options are available for customizing the results. You can choose the file extension of the input images, where to save it, etc.
         Check the help for more information.
@@ -47,122 +49,110 @@ def main():
     )
 
     parser.add_argument(
-        "input_dir",
-        help="List of directories containing the image files.",
+        "-r",
+        "--rgb",
+        help="List of directories containing image files to be converted to rgb files.",
         nargs="+",
     )
 
     parser.add_argument(
-        "output_dir",
+        "-b",
+        "--bsv",
+        help="List of directories containing subdirectories containing image files to be converted to rgb and bsv3 files.",
+        nargs="+",
+    )
+
+    parser.add_argument(
+        "-c",
+        "--bcell",
+        help="List of directories containing subdirectories containing image files to be converted to rgb and bcell files.",
+        nargs="+",
+    )
+
+    parser.add_argument(
+        "-o",
+        "--output",
         help="Directory where results will be stored.",
+        required=True
     )
 
     args = parser.parse_args()
-    directories = [Path(item) for item in args.input_dir]
+
+    # Get all directories.
+    rgb_files = [Path(item) for item in args.rgb if Path(item).exists() is True] if args.rgb is not None else []
+    rgb_files = [Path(directory).glob(f"*.{args.input_extension}") for directory in rgb_files]
+    rgb_files = [file for glob in rgb_files for file in glob]
+
+    bsv_files = [Path(item) for item in args.bsv if Path(item).exists() is True] if args.bsv is not None else []
+
+    bcell_files = [Path(item) for item in args.bcell if Path(item).exists() is True] if args.bcell is not None else []
+    bcell_files = [Path(directory).glob(f"*.{args.input_extension}") for directory in bcell_files]
+    bcell_files = [file for glob in bcell_files for file in glob]
 
     # Help with the progress report.
     n = 0
-    total = 0
 
-    print(f"\n\n--- CONVERTING {args.input_extension.upper()} FILES TO RGB FILES ---\n\n")
+    # Get total of files to convert.
 
-    print(
-        "Counting the number of files to convert (this might take a while) - ", end=""
-    )
+    rgb_total = len(rgb_files)
+    bsv_total = len(bsv_files)
+    bcell_total = len(bcell_files)
 
-    # Get total of files to convert and extract zipped files.
 
-    total = sum(
-        [len(list(Path(directory).glob(f"**/*.{args.input_extension}"))) for directory in directories]
-    )
-
-    if total == 0:
-        print("[No file(s) found!]\n\n")
-        print(f"Warning! No {args.input_extension} files found in the specified directories.")
-        print("Remember you should specify the directories where the files are, not the files themselves.")
-        print("If you need help, execute the following command: tsto2rgb --help\n\n")
+    # Check if there's any work to do.
+    if rgb_total + bsv_total + bcell_total == 0:
+        colorprint(styles["normal"], "\n\n [!] [No file(s) found!]\n\n")
+        colorprint(styles["normal"],f" [*] Warning! No {args.input_extension} files found in the specified directories.")
+        colorprint(styles["normal"]," [*] Remember you should specify the directories where the files are, not the files themselves.")
+        colorprint(styles["normal"]," [*] If you need help, execute the following command: tsto2rgb --help\n\n")
         return
 
-    print(f"[{total} file(s) found!]\n\n")
+    # Procede with operation.
+    if rgb_total > 0:
+        target = Path(args.output, "rgb")
+        target.mkdir(parents=True, exist_ok=True)
+        rgb_gen(rgb_files, target, rgb_total, args.input_extension, args.depth)
 
-    print(f"--- Starting conversion of {args.input_extension} images ---")
+    if bsv_total > 0:
+        target = Path(args.output, "bsv")
+        target.mkdir(parents=True, exist_ok=True)
+        bsv_gen(bsv_files, target, bsv_total, args.input_extension, args.depth)
 
-    # Set destination of the converted rgb files.
-    target = Path(args.output_dir)
-    target.mkdir(exist_ok=True)
 
-    for directory in directories:
 
-        # Process the remaining image files.
-        for img_file in directory.glob(f"**/*.{args.input_extension}"):
-            n += 1
-            report_progress(progress_str(n, total, img_file.stem, args.input_extension), "")
+#    if total == 0:
+#        print("[No file(s) found!]\n\n")
+#        print(f"Warning! No {args.input_extension} files found in the specified directories.")
+#        print("Remember you should specify the directories where the files are, not the files themselves.")
+#        print("If you need help, execute the following command: tsto2rgb --help\n\n")
+#        return
 
-            if args.group is True:
-                entity = img_file.stem.split("_", maxsplit=1)
+#    # Set destination of the converted rgb files.
+#    target = Path(args.output_dir)
+#    target.mkdir(exist_ok=True)
+#
+#    for directory in directories:
+#
+#        # Process the remaining image files.
+#        for img_file in directory.glob(f"**/*.{args.input_extension}"):
+#            n += 1
+#            report_progress(progress_str(n, total, img_file.stem, args.input_extension), "")
+#
+#            if args.group is True:
+#                entity = img_file.stem.split("_", maxsplit=1)
+#
+#                if len(entity) == 2:
+#                    target = Path(
+#                        args.output_dir, entity[0], entity[1].split("_image", maxsplit=1)[0]
+#                    )
+#                else:
+#                    target = Path(args.output_dir, entity[0], "_default")
+#
+#            else:
+#                target = Path(args.output_dir)
+#
+#            target.mkdir(parents=True, exist_ok=True)
 
-                if len(entity) == 2:
-                    target = Path(
-                        args.output_dir, entity[0], entity[1].split("_image", maxsplit=1)[0]
-                    )
-                else:
-                    target = Path(args.output_dir, entity[0], "_default")
-
-            else:
-                target = Path(args.output_dir)
-
-            target.mkdir(parents=True, exist_ok=True)
-
-            rgb_file = Path(target, f"{img_file.stem}.rgb")
-
-            if args.depth == 4:
-                with Image(filename=img_file).fx("u * a", channel="rgb") as tmp_img:
-                    width = tmp_img.width
-                    height = tmp_img.height
-
-                    # Swap collor channels for 4 bit depth.
-                    with Image() as rgb_img:
-                        rgb_img.image_add(tmp_img.channel_images["blue"])   # type: ignore
-                        rgb_img.image_add(tmp_img.channel_images["alpha"])  # type: ignore
-                        rgb_img.image_add(tmp_img.channel_images["red"])    # type: ignore
-                        rgb_img.image_add(tmp_img.channel_images["green"])  # type: ignore
-                        rgb_img.combine(colorspace="srgb")
-                        rgb_img.depth = args.depth
-                        rgb_img.format = "rgba"
-
-                        with open(rgb_file, "wb") as binary_file:
-                            # Append signature and image dimensions.
-                            binary_file.write(int.to_bytes(0, 2, "little"))
-                            binary_file.write(int.to_bytes(8192, 2, "little"))
-                            binary_file.write(int.to_bytes(width, 2, "little"))
-                            binary_file.write(int.to_bytes(height, 2, "little"))
-
-                            # Append rest of the image.
-                            binary_file.write(rgb_img.make_blob())  # type: ignore
-
-            elif args.depth == 8:
-                with Image(filename=img_file) as rgb_img:
-                    width = rgb_img.width
-                    height = rgb_img.height
-
-                    rgb_img.depth = args.depth
-                    rgb_img.format = "rgba"
-
-                    with open(rgb_file, "wb") as binary_file:
-                        # Append signature and image dimensions.
-                        binary_file.write(int.to_bytes(0, 2, "little"))
-                        binary_file.write(int.to_bytes(0, 2, "little"))
-                        binary_file.write(int.to_bytes(width, 2, "little"))
-                        binary_file.write(int.to_bytes(height, 2, "little"))
-
-                        # Append rest of the image.
-                        binary_file.write(rgb_img.make_blob())  # type: ignore
-            else:
-                # Ignore this file if it cannot be parsed.
-                # Clear line.
-                print(150 * " ", end="\r")
-                print(f"Invalid {args.input_extension} file. Skipping this file -> {img_file.name}!")
-                continue
 
 
     print("\n\n--- JOB COMPLETED!!! ---\n\n")
