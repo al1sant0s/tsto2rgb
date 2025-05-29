@@ -12,7 +12,6 @@ from tsto2rgb.parsers.bsv import bsv_gen
 
 
 def main():
-
     init()
 
     parser = argparse.ArgumentParser(
@@ -32,9 +31,18 @@ def main():
     )
 
     parser.add_argument(
+        "-d",
         "--depth",
         help="Depth used for the image (choose between 4 and 8 bits per channel).",
         default=4,
+        type=int,
+    )
+
+    parser.add_argument(
+        "-a",
+        "--alpha",
+        help="Alpha used for the bsv assets (0-255).",
+        default=255,
         type=int,
     )
 
@@ -70,23 +78,48 @@ def main():
     )
 
     parser.add_argument(
-        "-o",
-        "--output",
-        help="Directory where results will be stored.",
-        required=True
+        "-o", "--output", help="Directory where results will be stored.", required=True
     )
 
     args = parser.parse_args()
 
     # Get all directories.
-    rgb_files = [Path(item) for item in args.rgb if Path(item).exists() is True] if args.rgb is not None else []
-    rgb_files = [Path(directory).glob(f"*.{args.input_extension}") for directory in rgb_files]
+    rgb_files = (
+        [
+            Path(item)
+            for item in args.rgb
+            if Path(item).is_dir() is True and Path(item).name not in ("", ".", "..")
+        ]
+        if args.rgb is not None
+        else []
+    )
+    rgb_files = [
+        Path(directory).glob(f"*.{args.input_extension}") for directory in rgb_files
+    ]
     rgb_files = [file for glob in rgb_files for file in glob]
 
-    bsv_files = [Path(item) for item in args.bsv if Path(item).exists() is True] if args.bsv is not None else []
+    bsv_files = (
+        [
+            Path(item)
+            for item in args.bsv
+            if Path(item).is_dir() is True and Path(item).name not in ("", ".", "..")
+        ]
+        if args.bsv is not None
+        else []
+    )
 
-    bcell_files = [Path(item) for item in args.bcell if Path(item).exists() is True] if args.bcell is not None else []
-    bcell_files = [Path(directory).glob(f"*.{args.input_extension}") for directory in bcell_files]
+    bcell_files = (
+        [
+            Path(item)
+            for item in args.bcell
+            if Path(item).is_dir() is True and Path(item).name not in ("", ".", "..")
+        ]
+        if args.bcell is not None
+        else []
+    )
+    bcell_files = [
+        Path(directory).glob(f"*.{args.input_extension}") for directory in bcell_files
+    ]
     bcell_files = [file for glob in bcell_files for file in glob]
 
     # Help with the progress report.
@@ -98,13 +131,21 @@ def main():
     bsv_total = len(bsv_files)
     bcell_total = len(bcell_files)
 
-
     # Check if there's any work to do.
     if rgb_total + bsv_total + bcell_total == 0:
         colorprint(styles["normal"], "\n\n [!] [No file(s) found!]\n\n")
-        colorprint(styles["normal"],f" [*] Warning! No {args.input_extension} files found in the specified directories.")
-        colorprint(styles["normal"]," [*] Remember you should specify the directories where the files are, not the files themselves.")
-        colorprint(styles["normal"]," [*] If you need help, execute the following command: tsto2rgb --help\n\n")
+        colorprint(
+            styles["normal"],
+            f" [*] Warning! No {args.input_extension} files found in the specified directories.",
+        )
+        colorprint(
+            styles["normal"],
+            " [*] Remember you should specify the directories where the files are, not the files themselves.",
+        )
+        colorprint(
+            styles["normal"],
+            " [*] If you need help, execute the following command: tsto2rgb --help\n\n",
+        )
         return
 
     # Procede with operation.
@@ -116,43 +157,41 @@ def main():
     if bsv_total > 0:
         target = Path(args.output, "bsv")
         target.mkdir(parents=True, exist_ok=True)
-        bsv_gen(bsv_files, target, bsv_total, args.input_extension, args.depth)
+        bsv_gen(
+            bsv_files, target, bsv_total, args.input_extension, args.depth, args.alpha
+        )
 
+    #    if total == 0:
+    #        print("[No file(s) found!]\n\n")
+    #        print(f"Warning! No {args.input_extension} files found in the specified directories.")
+    #        print("Remember you should specify the directories where the files are, not the files themselves.")
+    #        print("If you need help, execute the following command: tsto2rgb --help\n\n")
+    #        return
 
-
-#    if total == 0:
-#        print("[No file(s) found!]\n\n")
-#        print(f"Warning! No {args.input_extension} files found in the specified directories.")
-#        print("Remember you should specify the directories where the files are, not the files themselves.")
-#        print("If you need help, execute the following command: tsto2rgb --help\n\n")
-#        return
-
-#    # Set destination of the converted rgb files.
-#    target = Path(args.output_dir)
-#    target.mkdir(exist_ok=True)
-#
-#    for directory in directories:
-#
-#        # Process the remaining image files.
-#        for img_file in directory.glob(f"**/*.{args.input_extension}"):
-#            n += 1
-#            report_progress(progress_str(n, total, img_file.stem, args.input_extension), "")
-#
-#            if args.group is True:
-#                entity = img_file.stem.split("_", maxsplit=1)
-#
-#                if len(entity) == 2:
-#                    target = Path(
-#                        args.output_dir, entity[0], entity[1].split("_image", maxsplit=1)[0]
-#                    )
-#                else:
-#                    target = Path(args.output_dir, entity[0], "_default")
-#
-#            else:
-#                target = Path(args.output_dir)
-#
-#            target.mkdir(parents=True, exist_ok=True)
-
-
+    #    # Set destination of the converted rgb files.
+    #    target = Path(args.output_dir)
+    #    target.mkdir(exist_ok=True)
+    #
+    #    for directory in directories:
+    #
+    #        # Process the remaining image files.
+    #        for img_file in directory.glob(f"**/*.{args.input_extension}"):
+    #            n += 1
+    #            report_progress(progress_str(n, total, img_file.stem, args.input_extension), "")
+    #
+    #            if args.group is True:
+    #                entity = img_file.stem.split("_", maxsplit=1)
+    #
+    #                if len(entity) == 2:
+    #                    target = Path(
+    #                        args.output_dir, entity[0], entity[1].split("_image", maxsplit=1)[0]
+    #                    )
+    #                else:
+    #                    target = Path(args.output_dir, entity[0], "_default")
+    #
+    #            else:
+    #                target = Path(args.output_dir)
+    #
+    #            target.mkdir(parents=True, exist_ok=True)
 
     print("\n\n--- JOB COMPLETED!!! ---\n\n")
