@@ -1,7 +1,12 @@
 from wand.image import Image
 from pathlib import Path
-from tsto2rgb.parsers.styles import styles, generic_header, generic_body, generic_footer
-from tsto2rgb.tools.progress import report_progress
+from tsto2rgb.tools import (
+    styles,
+    generic_header,
+    generic_body,
+    generic_footer,
+    report_progress,
+)
 
 
 def rgb_parser(main_img, target, depth):

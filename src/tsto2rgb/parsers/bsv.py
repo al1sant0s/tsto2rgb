@@ -1,4 +1,3 @@
-from ctypes.util import find_library
 import json
 import os
 import subprocess
@@ -7,11 +6,15 @@ import numpy as np
 import xml.etree.ElementTree as ET
 from wand.image import Image
 from pathlib import Path
-from colorama import Style
-from tsto2rgb.parsers.rgb import rgb_parser
-from tsto2rgb.parsers.styles import styles, generic_header, generic_body, generic_footer
-from tsto2rgb.tools.progress import report_progress
-from tsto2rgb.tools.misc import write_str_to_file
+from tsto2rgb.parsers import rgb_parser
+from tsto2rgb.tools import (
+    styles,
+    generic_header,
+    generic_body,
+    generic_footer,
+    write_str_to_file,
+    report_progress,
+)
 
 dicer = Path(Path(__file__).parent, "dicer", "linux")
 
@@ -200,7 +203,11 @@ def bsv_parser(directory, target, offsetX, offsetZ, depth, alpha):
                 "-r",
             ]
             # Call dicer.
-            status = subprocess.run(dicer_args + [directory]).returncode
+            status = subprocess.run(
+                dicer_args + [directory],
+                stdout=subprocess.DEVNULL,
+                stderr=subprocess.STDOUT,
+            ).returncode
             if status == 0:
                 jsonfile = Path(tempdir, "sprites.json")
                 atlases = list(Path(tempdir).glob("*.png"))
@@ -265,36 +272,24 @@ def bsv_parser(directory, target, offsetX, offsetZ, depth, alpha):
             else:
                 return (False, "Dicer failed!")
     else:
-        return (False, "No animation directories found!")
+        return (False, "No animation subdirectories found!")
 
 
-def bsv_gen(files, target, total, input_extension, depth, alpha):
+def bsv_gen(directories, target, total, input_extension, depth, alpha):
     generic_header(styles["bsv"], "bsv", total, input_extension, depth)
     generic_body(styles["bsv"])
-    invalid_files = []
+    invalid_directories = []
     for i in range(total):
-        print(files[i])
-        offsetX, offsetZ, depth, alpha = get_properties(files[i], depth, alpha)
-        status, reason = bsv_parser(files[i], target, offsetX, offsetZ, depth, alpha)
+        report_progress(
+            f" * Progress: {(i + 1) * 100 // total:3d}% -> {directories[i].stem}.bsv3",
+            "",
+            styles["normal"],
+        )
+        offsetX, offsetZ, depth, alpha = get_properties(directories[i], depth, alpha)
+        status, reason = bsv_parser(
+            directories[i], target, offsetX, offsetZ, depth, alpha
+        )
         if status is False:
-            invalid_files.append(files[i].name + f": {reason}")
+            invalid_directories.append(directories[i].name + f": {reason}")
 
-    generic_footer(styles["bsv"], total, invalid_files)
-
-
-# def rgb_gen(files, target, total, input_extension, depth):
-#    generic_header(styles["rgb"], "rgb", total, input_extension, depth)
-#    generic_body(styles["rgb"])
-#
-#    invalid_files = []
-#    for i in range(total):
-#        status = rgb_parser(files[i], target, depth)
-#        report_progress(
-#            f" * Progress: {(i+1) * 100 // total:3d}% -> {files[i].stem}.{input_extension}",
-#            "",
-#            styles["normal"]
-#        )
-#        if status is False:
-#            invalid_files.append(files[i].name)
-#
-#    generic_footer(styles["rgb"], total, invalid_files)
+    generic_footer(styles["bsv"], total, invalid_directories)

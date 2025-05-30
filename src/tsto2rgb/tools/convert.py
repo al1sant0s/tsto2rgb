@@ -1,10 +1,8 @@
 import argparse
 from pathlib import Path
 from colorama import init
-from tsto2rgb.parsers import rgb
-from tsto2rgb.parsers.styles import styles, colorprint
-from tsto2rgb.parsers.rgb import rgb_gen
-from tsto2rgb.parsers.bsv import bsv_gen
+from tsto2rgb.tools import styles, colorprint
+from tsto2rgb.parsers import rgb_gen, bsv_gen, bcell_gen
 
 
 # Warning: this script requires ImageMagick to work. If you do not have installed in your system,
@@ -44,6 +42,17 @@ def main():
         help="Alpha used for the bsv assets (0-255).",
         default=255,
         type=int,
+    )
+
+    parser.add_argument(
+        "-t",
+        "--time",
+        help="""
+        Time in miliseconds used for the frames in a new bcell asset. This value will only
+        be used if there is no cell.xml file within the source image directory.
+        """,
+        default=1000 / 12,
+        type=float,
     )
 
     parser.add_argument(
@@ -98,7 +107,7 @@ def main():
     ]
     rgb_files = [file for glob in rgb_files for file in glob]
 
-    bsv_files = (
+    bsv_directiores = (
         [
             Path(item)
             for item in args.bsv
@@ -108,7 +117,7 @@ def main():
         else []
     )
 
-    bcell_files = (
+    bcell_directiories = (
         [
             Path(item)
             for item in args.bcell
@@ -117,10 +126,6 @@ def main():
         if args.bcell is not None
         else []
     )
-    bcell_files = [
-        Path(directory).glob(f"*.{args.input_extension}") for directory in bcell_files
-    ]
-    bcell_files = [file for glob in bcell_files for file in glob]
 
     # Help with the progress report.
     n = 0
@@ -128,8 +133,8 @@ def main():
     # Get total of files to convert.
 
     rgb_total = len(rgb_files)
-    bsv_total = len(bsv_files)
-    bcell_total = len(bcell_files)
+    bsv_total = len(bsv_directiores)
+    bcell_total = len(bcell_directiories)
 
     # Check if there's any work to do.
     if rgb_total + bsv_total + bcell_total == 0:
@@ -150,15 +155,32 @@ def main():
 
     # Procede with operation.
     if rgb_total > 0:
-        target = Path(args.output, "rgb")
+        target = Path(args.output)
         target.mkdir(parents=True, exist_ok=True)
         rgb_gen(rgb_files, target, rgb_total, args.input_extension, args.depth)
 
     if bsv_total > 0:
-        target = Path(args.output, "bsv")
+        target = Path(args.output)
         target.mkdir(parents=True, exist_ok=True)
         bsv_gen(
-            bsv_files, target, bsv_total, args.input_extension, args.depth, args.alpha
+            bsv_directiores,
+            target,
+            bsv_total,
+            args.input_extension,
+            args.depth,
+            args.alpha,
+        )
+
+    if bcell_total > 0:
+        target = Path(args.output)
+        target.mkdir(parents=True, exist_ok=True)
+        bcell_gen(
+            bcell_directiories,
+            target,
+            bcell_total,
+            args.input_extension,
+            args.depth,
+            args.time,
         )
 
     #    if total == 0:
