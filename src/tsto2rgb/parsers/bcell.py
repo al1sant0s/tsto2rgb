@@ -1,5 +1,6 @@
 import numpy as np
 import xml.etree.ElementTree as ET
+from natsort import natsorted
 from wand.image import Image
 from pathlib import Path
 from tsto2rgb.parsers.rgb import rgb_parser
@@ -95,10 +96,7 @@ def bcell_gen(directories, target, total, input_extension, depth, time):
 
     invalid_directories = []
     for i in range(total):
-        img_list = sorted(
-            directories[i].glob(f"*.{input_extension}"),
-            key=lambda x: x.stem.rsplit("_")[-1].strip("0"),
-        )
+        img_list = natsorted(directories[i].glob(f"*.{input_extension}"))
         img_filter = list()
 
         # Try to convert these images to rgb.

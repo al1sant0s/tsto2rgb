@@ -255,7 +255,7 @@ def bsv_parser(directory, target, offsetX, offsetZ, depth, alpha):
                                 "Building",
                                 attrib={
                                     "x": "5",
-                                    "y": "5",
+                                    "z": "5",
                                     "height": "3.5",
                                     "locX": "1",
                                     "locY": "5",

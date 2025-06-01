@@ -95,9 +95,10 @@ def main():
     # Get all directories.
     rgb_files = (
         [
-            Path(item)
+            Path(item).resolve()
             for item in args.rgb
-            if Path(item).is_dir() is True and Path(item).name not in ("", ".", "..")
+            if Path(item).resolve().is_dir() is True
+            and Path(item).resolve().name not in ("", ".", "..")
         ]
         if args.rgb is not None
         else []
@@ -109,9 +110,10 @@ def main():
 
     bsv_directiores = (
         [
-            Path(item)
+            Path(item).resolve()
             for item in args.bsv
-            if Path(item).is_dir() is True and Path(item).name not in ("", ".", "..")
+            if Path(item).resolve().is_dir() is True
+            and Path(item).resolve().name not in ("", ".", "..")
         ]
         if args.bsv is not None
         else []
@@ -119,9 +121,10 @@ def main():
 
     bcell_directiories = (
         [
-            Path(item)
+            Path(item).resolve()
             for item in args.bcell
-            if Path(item).is_dir() is True and Path(item).name not in ("", ".", "..")
+            if Path(item).resolve().is_dir() is True
+            and Path(item).resolve().name not in ("", ".", "..")
         ]
         if args.bcell is not None
         else []
