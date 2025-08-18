@@ -16,7 +16,7 @@ classifiers = [
     "License :: OSI Approved :: MIT License",
     "Operating System :: OS Independent",
 ]
-dependencies = ["numpy", "wand"]
+dependencies = ["numpy", "wand", "natsort"]
 
 [project.scripts]
 tsto2rgb = "tsto2rgb.tools.convert:main"
