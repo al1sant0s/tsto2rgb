@@ -54,7 +54,7 @@ tsto2rgb -d 8 -r /path/to/images -o /path/to/new-rgb-images/
 Following with the same logic as for making rgb, you will use --bsv [-b] option followed by a list of directories with your buildings, decorations, etc. As before specify the output directory at the end of the command.
 
 ```
-tsto2rgb -b /path/to/building01 /path/to/building02 -o /path/to/mybuildings/
+tsto2rgb -b /path/to/building01 /path/to/building02 -o /path/to/new-bsv/
 ```
 
 Beware that each directory you provide as an argument -b option option must
@@ -100,17 +100,31 @@ Without getting into too much details, you will see:
 * Active_Out is an animation that plays once the last character doing a job at the Simpsons house finishes (their thumbs-up icon is tapped by the player). Works as a transition between Active and Neutral animations.
 * Eggs is an overlay animation of eggs that covers the Simpsons house. It's currently unused by the game and is just a leftover of previous halloween events.
 
-Here's an screenshot of the Active subdirectory. Notice how the frames are named just as numbers.
+Here's an screenshot of the Active subdirectory from my filesystem:
+
+<img width="2050" height="1166" alt="img-house" src="https://github.com/user-attachments/assets/7af9c6c8-ffeb-40d7-8b44-bc03d8b5e5bc" />
+
+Notice how the frames are numbered. That's a way to enforce their correct order. Now it's time to actually make those images into the required assets for an actual building. Confirming the strucuture above,
+here's how the files should be stuctured.
+
+<img width="1915" height="296" alt="image" src="https://github.com/user-attachments/assets/7e99c213-f43d-4fd9-9b20-f493cf1970ad" />
 
 
+Now with the folowing command I run, the corresponding rgb and bsv3 files will be made for the Simpsons house. 
 
+```
+tsto2rgb -b Stage/simpsonshouse/ -o 4_70_NewHorizons/NewHorizons-BuildDecoGame-100/
+```
 
-How about a more complex building?! Let's say it's called "Chocolate House". Now this is a building that has a neutral state and also an active state i.e. the state/animation that plays on loop when characters do jobs on that building.
-Heres how you would structure it:
+<img width="730" height="431" alt="image" src="https://github.com/user-attachments/assets/3e85b02c-2707-4004-96b8-b9377a51001a" />
 
-* brandnewbuilding/
-  * Neutral/
-    * 0.png
+In this example I'm saving the produced assets into the directory of a new DLC called  _4_70_NewHorizons_. To actually see those assets in game it's required to pack them as DLC and
+modify the gamescripts to load them in game. This process is out of the scope of this guide though.
+
+Now! Here are the files that were made for the Simpsons house:
+
+<img width="815" height="298" alt="image" src="https://github.com/user-attachments/assets/c1927350-e56d-4bc1-a5de-0979f4e40df9" />
+
 
 ## Multiple directories
 
