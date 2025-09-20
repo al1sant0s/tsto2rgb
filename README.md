@@ -57,7 +57,7 @@ Following with the same logic as for making rgb, you will use --bsv [-b] option 
 tsto2rgb -b /path/to/building01 /path/to/building02 -o /path/to/new-bsv/
 ```
 
-Beware that each directory you provide as an argument to -b option option must:
+Beware that each directory you provide as an argument to -b option must:
 
 1. represent **only one** entity (i.e., a building or a decoration);
 2. follow the specific file structure presented bellow. **Note! The names used here are just placeholders:**
@@ -76,14 +76,17 @@ Beware that each directory you provide as an argument to -b option option must:
          * ...rest of the image files...
 3. only contain images that all share the same dimensions. This is quite an important point and it's necessary to avoid your buildings "wobbling"
    when their animations are shown in game.
+4. the images must be named in a way that they are listed in the correct order. You can simply name them with natural numbers if you wish. You can also prepend
+   them with an preffix like "frame_" e.g. frame_00.png, frame_01.png, etc.
 
-That is, nameofthebuilding will be a directory named with the name of your building (prefer to use non spaced lowercase names here).
+To further elaborate on the previous points, nameofthebuilding will be a directory named with the name of your building (prefer to use non spaced lowercase names here).
 Within nameofthebuilding directory you should have subdirectories each corresponding to one animation (also called state) your building has.
 Within each animation subdirectory you should actually have the frames for that animation. All the images from all animations subdirectories must convey
-to the same dimensions. Think of passing your images like a slideshow, they must be properly aligned to avoid a wobbling effect.
+to the same dimensions. Think of passing your images like a slideshow, they must be properly aligned to avoid a wobbling effect. Finally, name your frames in a way
+that indicates some kind of order. If you name your frames in such a manner that your file explorer software lists them in the desired order then this is correct.
 
-Usually when it comes to the animations subdirectories names all buildings have a Neutral animation.
-For example, imagine you have a static building i.e. just one frame (no animations), and you decided to call it "Brand New Building" (this is just the formal name).
+Usually when it comes to the animations subdirectories, all buildings have a Neutral animation.
+For example, imagine you have a static building i.e. just one frame, and you decided to call it "Brand New Building" (this is just the formal name).
 Here's how you would structure your building:
 
 * brandnewbuilding/
@@ -93,8 +96,10 @@ Here's how you would structure your building:
 So you have a directory named brandnewbuilding. Within that directory you have another directory called Neutral (because your building only has a neutral animation). Finally you have all your images
 for that animation within the Neutral directory itself. In this specific example you would have just one frame that's named 0.png.
 
-Now for a reala and more complex example. Suppose you have been tasked with implementing the "Simpsons House". I know! That building already exists in the game but let's pretend it doesn't (as strange as it sounds).
-Taking the real Simpsons house asset from the game you will find out that it's structured like this (the states may not be in this exactly order in the original bsv3 file):
+Now for a real and more complex showcase, it's time to demonstrate how to implement a real building in game. For this example the Simpsons house will be used. The files to reproduce this example
+will not be provided by this guide but you can just reproduce the next steps to any other building/decoration you wish to implement for the game so pay close attention!
+
+The Simpsons house bsv3 file from the game it's structured like this (the animations may not be listed in this exactly order in the original bsv3 file):
 
 * simpsonshouse/
   * Active/
@@ -116,11 +121,10 @@ Here's an screenshot of the Active subdirectory from my filesystem:
 
 <img width="2050" height="1166" alt="image" src="https://github.com/user-attachments/assets/ea66bde8-beed-4884-87c9-fa6a0d8e4f24" />
 
-Notice how the frames are numbered. That's a way to enforce their correct order. Now it's time to actually make those images into the required assets for an actual building. Confirming the strucuture above,
+Notice how the frames are numbered. That's a way to enforce their correct order as stated before. Now it's time to actually make those images into the required assets for an actual building. Confirming the strucuture above,
 here's how the files should be stuctured.
 
 <img width="814" height="404" alt="image" src="https://github.com/user-attachments/assets/27f10fa4-cd0e-4ef9-9d77-c5ef4b3da963" />
-
 
 Now with the folowing command I run, the corresponding rgb and bsv3 files will be made for the Simpsons house. 
 
@@ -131,14 +135,14 @@ tsto2rgb -b Stage/simpsonshouse/ -o 4_70_NewHorizons/NewHorizons-BuildDecoGame-1
 <img width="730" height="431" alt="image" src="https://github.com/user-attachments/assets/3e85b02c-2707-4004-96b8-b9377a51001a" />
 
 In this example I'm saving the new created assets into the directory of a custom DLC called _4_70_NewHorizons_. To actually see those assets in game it's necessary to pack them as DLC and
-modify the gamescripts to load them. The way to do this is way beyond the scope of this guide so it will not be shown. The focus here is to produce the assets and how to use the tsto2rgb to modify the way they look in game.
+modify the gamescripts to load them. The way to do this is way beyond the scope of this guide so it will not be shown. The focus here is to produce the assets and how to use tsto2rgb to modify the way they look in game.
 
 With that said, here are the new files that were made for the Simpsons house:
 
 <img width="815" height="298" alt="image" src="https://github.com/user-attachments/assets/c1927350-e56d-4bc1-a5de-0979f4e40df9" />
 
-The image data is located in the rgb and bsv3 files. The 3rd file called simpsonshouse.xml is where you will configure your buildings characteristics. The default configuration of this
-file and for any new building you create a bsv3 asset for will looks like this
+The image data is located in the rgb and bsv3 files. The third file called simpsonshouse.xml is where you will configure your buildings characteristics. The default configuration of this
+file and for any new building you create a bsv3 asset for will look like this
 
 ```
 <Building x="5" z="5" height="3.5" locX="1" locY="5" transImageX="0.0" transImageY="0.0" offsetX="0" offsetZ="0" depth="4" alpha="255" />
@@ -147,14 +151,14 @@ file and for any new building you create a bsv3 asset for will looks like this
 Here you have several attributes. All attributes, except the last 4 attributes, are used by the game.
 OffsetX, offsetZ, depth and alpha are used by tsto2rgb itself.
 
-Before explaing this line of xml furhter let's see how the Simpsons house looks in game. After doing the necessary modifications in gamescripts and have used [tstodlc](https://github.com/al1sant0s/tstodlc/) to install the _4_70_NewHorizons_ DLC into my local gameserver DLC repository. Here's the _not really_ new Simpsons house in game.
+Before explaing this line of xml furhter let's see how the Simpsons house looks in game with the new files. After doing the necessary modifications in gamescripts and have used [tstodlc](https://github.com/al1sant0s/tstodlc/) to install the _4_70_NewHorizons_ DLC into my local gameserver DLC repository. Here's the _not really new_ Simpsons house in game.
 
 <img width="2050" height="1166" alt="image" src="https://github.com/user-attachments/assets/9195916b-9dd0-42cd-a50f-d25bb7a845b5" />
 
 Wow! Lots of wrong things here. First the building itself doesn't lay onto that green rectangle. The green rectangle represents the real position of the building so the sprite should be drawn correctly above it.
 Also you can clearly see how the green rectangle is not big enough to acomodate the whole Simpsons house foundation.
 
-To fix this we need to edit 4 attributes in simpsonshouse.xml. The attributes "x" and "z" controls the dimensions of the green rectangle while "offsetX" and "offsetZ" state offsets for the postion where the sprite is being drawn.
+To fix this we need to edit 4 attributes in simpsonshouse.xml. The attributes "x" and "z" control the dimensions of the green rectangle while "offsetX" and "offsetZ" define offsets for the position where the sprite is being drawn.
 Our mission here is to come up with the appropriate values for those 4 attributes so the building lays on a correct sized green rectangle when selected in rearrange mode (the mode where you move buildings in game).
 
 Let's start first by fixing the offsets by editing "offsetX" and "offsetZ" attributes so the house appears above the rectangle. We need to go to where the rgb/bsv3/xml files were saved and edit the xml file (in this case simpsonshouse.xml).
@@ -166,7 +170,9 @@ Each offset attribute moves with positive values according to the following axes
 
 <img width="2248" height="1385" alt="final_grid" src="https://github.com/user-attachments/assets/22727e17-5b1d-4ece-9126-4cbc07513438" />
 
-Unfortunatelly, guessing the correct values is done with trial and error.
+Unfortunatelly, guessing the correct values is done with trial and error. So at this point it's up to you to throw values in there, rerun the tsto2rgb command to remake the assets, and it's quite important
+that you point tsto2rgb to the same place where your current resulting rgb/bsv3/xml files are because tsto2rgb will retrieve the offset and other attributes from there and embed them into the bsv3 file; reinstall the DLC with
+the new rgb/bsv3/xml files and check how they look in game. Rise and repeat until you get with a desired result.
 
 
 ## Multiple directories
