@@ -85,11 +85,11 @@ Now for a real example. Suppose you have been tasked with implementing the "Simp
 Taking the real Simpsons house asset from the game you will find out that it's structured like this (the states may not be in this exactly order in the original bsv3 file):
 
 * simpsonshouse/
- * Active/
- * Active_In/
- * Active_Out/
- * Eggs/
- * Neutral/
+  * Active/
+  * Active_In/
+  * Active_Out/
+  * Eggs/
+  * Neutral/
 
 Without getting into too much details, you will see:
 
@@ -98,9 +98,11 @@ Without getting into too much details, you will see:
 * Active_In is an animation that plays once a character, about to do a job at the Simpsons house, reaches it. If the building is currently playing the Neutral animation, the Active_In animation will be played before
   the Active animation starts. In other words is the animation that works as a transition between the Neutral and Active animations.
 * Active_Out is an animation that plays once the last character doing a job at the Simpsons house finishes (their thumbs-up icon is tapped by the player). Works as a transition between Active and Neutral animations.
-* Eggs is an overlay animation (just one frame) of eggs that covers the Simpsons house. It's currently unused by the game and is just a leftover of previous halloween events.
+* Eggs is an overlay animation of eggs that covers the Simpsons house. It's currently unused by the game and is just a leftover of previous halloween events.
 
-  
+Here's an screenshot of the Active subdirectory. Notice how the frames are named just as numbers.
+
+
 
 
 How about a more complex building?! Let's say it's called "Chocolate House". Now this is a building that has a neutral state and also an active state i.e. the state/animation that plays on loop when characters do jobs on that building.
