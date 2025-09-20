@@ -189,7 +189,7 @@ Let's start by resizing the green rectangle. In this case the adequate values ar
 
 and here how it looks in game now
 
-<img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/b638a072-81c7-457f-a2a4-98c485ec1e52" />
+<img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/d483445d-f34f-47de-8c3f-90b78ed9b5bf" />
 
 Much better right?! Now to fix the offsets by editing "offsetX" and "offsetZ" attributes so the house appears above the rectangle.
 Here is the file currently
@@ -200,34 +200,28 @@ Each offset attribute moves with positive values according to the following axes
 
 <img width="2248" height="1385" alt="final_grid" src="https://github.com/user-attachments/assets/22727e17-5b1d-4ece-9126-4cbc07513438" />
 
-and here how it looks now
-
-<img width="2050" height="1166" alt="image" src="https://github.com/user-attachments/assets/5af7ebf6-c1ec-4261-8222-f873c57ba5ec" />
-
 
 Unfortunatelly, guessing the correct values is done with trial and error. So at this point it's up to you to throw values in there, rerun the tsto2rgb command to remake the assets and reinstall the DLC with
 the new rgb/bsv3/xml files and check how they look in game. Rise and repeat until you get with a desired result. Also when reruning tsto2rgb command it's quite important
 that you point it to save to the same place where your current resulting rgb/bsv3/xml files are because it will retrieve the offsets and other attributes from there and embed them into the newest bsv3 file.
 
-
-
-
-## Multiple directories
-
-An example specifying multiple directories as input and saving the results in the assets directory.
+In this case the following values did the trick.
 
 ```
-tsto2rgb path/to/Downloads/img_files path/to/Images/img_folder path/to/Images/another_img_folder path/to/assets
+<Building x="5" z="7" height="3.5" locX="1" locY="5" transImageX="0.0" transImageY="0.0" offsetX="0.215" offsetZ="0.125" depth="4" alpha="1.0" />
 ```
 
-If you want to search for the image files recursively in every subdirectory bellow a specific directory, give the root directory as input. The following example will convert all the image files within the 'Images' directory,
-including the 'img_folder' and 'another_img_folder' subdirectories.
+and here how it looks now
 
-```
-tsto2rgb path/to/Downloads/img_files path/to/Images path/to/assets
-```
+<img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/7da00908-5252-451f-8a7e-fa3a87def700" />
 
-## Grouping images
+Perfect! Now just do this for any other building or decoration you have.
+
+### Making Bcell assets
+
+> WIP
+
+### Grouping images
 
 Set the --group argument to organize the images in subdirectories within the destination directory.
 Each subdirectory corresponds to a certain entity. For example, if there were two image files in 'img_dir', one named
@@ -252,5 +246,5 @@ For example, given the name 'something_anything_else.png', _something_ is the en
 When a file corresponding to an entity doesn't specify a variation (a filename without an underscore in it like 'orangehouse.png') the _default variation subdirectory will be created.
 
 ```
-tsto2rgb --group path/to/Images path/to/assets
+tsto2rgb --group -r path/to/Images -o path/to/results
 ```
