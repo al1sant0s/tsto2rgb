@@ -1,7 +1,7 @@
 # Convert image files files for TSTO
 
-This package allows you to convert images into rgb/bsv3/bcellL assets for the 'The Simpsons: Tapped Out' game.
-It uses [**ImageMagick**](https://imagemagick.org/) to perform the conversions and (**sprite-dicing**)[https://github.com/elringus/sprite-dicing] under the hood.
+This package allows you to convert images into rgb/bsv3/bcell assets for the 'The Simpsons: Tapped Out' game.
+It uses [**ImageMagick**](https://imagemagick.org/) to perform the conversions and [**sprite-dicing**](https://github.com/elringus/sprite-dicing) under the hood.
 
 ## Installation
 
