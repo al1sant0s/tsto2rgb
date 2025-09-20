@@ -51,28 +51,64 @@ tsto2rgb -d 8 -r /path/to/images -o /path/to/new-rgb-images/
 
 ### Making BSV3 assets
 
-Following with the same logic as for making rgb, you will use --bsv [-b] option followed by a list of directories with your buildings, decorations, etc. Beware that each directory you provide as an argument to this option must
+Following with the same logic as for making rgb, you will use --bsv [-b] option followed by a list of directories with your buildings, decorations, etc. As before specify the output directory at the end of the command.
+
+```
+tsto2rgb -b /path/to/building01 /path/to/building02 -o /path/to/mybuildings/
+```
+
+Beware that each directory you provide as an argument -b option option must
 be associated with **only one** entity (i.e., a building or a decoration). They also must follow the following structure. Note! The names used bellow are placeholders.
 
 * nameofthebuilding/
   * StateNameA/
       * 0.png
       * 1.png
-      * ...
+      * ...rest of the image files...
   * StateNameB/
   * StateNameC/
 
 That is, nameofthebuilding will be a directory named with the name of your building (prefer to use non spaced lowercase names here).
-Within nameofthebuilding directory you should have subdirectories each corresponding to one state/animation your building has. For example, usually all buildings
-have a Neutral animation. For example, imagine you have a static building with just one frame (no animations at all) and you decided to call it "Brand New Building" (this is just the formal name).
+Within nameofthebuilding directory you should have subdirectories each corresponding to one animation (also called state) your building has. 
+
+Usually all buildings have a Neutral animation. For example, imagine you have a static building i.e. just one frame (no animations), and you decided to call it "Brand New Building" (this is just the formal name).
 Here's how you would structure your building:
 
 * brandnewbuilding/
   * Neutral/
     * 0.png
 
-So you have a directory named brandnewbuilding. Within that directory you have another directory called Neutral (because your building only have a neutral state). Finally you have all your images
-for that state within the Neutral directory itself. In this specific example you would have one frame that's named 0.png.
+So you have a directory named brandnewbuilding. Within that directory you have another directory called Neutral (because your building only has a neutral animation). Finally you have all your images
+for that animation within the Neutral directory itself. In this specific example you would have one frame that's named 0.png.
+
+Now for a real example. Suppose you have been tasked with implementing the "Simpsons House". I know! That building already exists in the game but let's pretend it doesn't (as strange as it sounds).
+Taking the real Simpsons house asset from the game you will find out that it's structured like this (the states may not be in this exactly order in the original bsv3 file):
+
+* simpsonshouse/
+ * Active/
+ * Active_In/
+ * Active_Out/
+ * Eggs/
+ * Neutral/
+
+Without getting into too much details, you will see:
+
+* An animation called "Active" that plays on loop when characters are doing jobs in the simpsons house;
+* The Neutral animation that is actually just one frame (the regular simpsons house with the closed windows);
+* Active_In is an animation that plays once a character, about to do a job at the Simpsons house, reaches it. If the building is currently playing the Neutral animation, the Active_In animation will be played before
+  the Active animation starts. In other words is the animation that works as a transition between the Neutral and Active animations.
+* Active_Out is an animation that plays once the last character doing a job at the Simpsons house finishes (their thumbs-up icon is tapped by the player). Works as a transition between Active and Neutral animations.
+* Eggs is an overlay animation (just one frame) of eggs that covers the Simpsons house. It's currently unused by the game and is just a leftover of previous halloween events.
+
+  
+
+
+How about a more complex building?! Let's say it's called "Chocolate House". Now this is a building that has a neutral state and also an active state i.e. the state/animation that plays on loop when characters do jobs on that building.
+Heres how you would structure it:
+
+* brandnewbuilding/
+  * Neutral/
+    * 0.png
 
 ## Multiple directories
 
