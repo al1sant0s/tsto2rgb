@@ -1,7 +1,6 @@
 import platform
 import json
 import os
-import shutil
 import subprocess
 import tempfile
 import numpy as np
@@ -22,7 +21,7 @@ from tsto2rgb.tools import (
 
 def get_dicer_path():
     os_name = platform.system().lower()
-    dicer = Path(Path(__file__).parent, "dicer").glob(f"dice-{os_name}-x64")
+    dicer = Path(Path(__file__).parent, "dicer").glob(f"*{os_name}*")
 
     return next(dicer)
 
@@ -51,9 +50,10 @@ def set_properties(directory, target, depth=4, alpha=255):
         root = tree.getroot()
 
         for key, value in definitions.items():
-            definitions[key] = root.get("key", value)
+            definitions[key] = root.get(key, value)
 
 
+    print(definitions)
     root = ET.Element("Building", definitions)
     tree = ET.ElementTree(root)
     ET.indent(tree, "  ")
