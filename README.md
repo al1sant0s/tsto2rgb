@@ -1,7 +1,7 @@
-# Convert image files to RGB files for TSTO
+# Convert image files to RGB/BSV3/BCELL files for TSTO
 
-This package allows you to convert images into RGB assets for the 'The Simpsons: Tapped Out' game.
-It uses [**ImageMagick**](https://imagemagick.org/) to perform the conversions.
+This package allows you to convert images into RGB/BSV3/BCELL assets for the 'The Simpsons: Tapped Out' game.
+It uses [**ImageMagick**](https://imagemagick.org/) to perform the conversions and (**sprite-dicing**)[https://github.com/elringus/sprite-dicing] under the hood.
 
 ## Installation
 
@@ -24,29 +24,55 @@ If you use windows I recommend you to get the modern [windows terminal from micr
 
 ## Usage
 
+The convert tool will receive a list of directories to search for the image files of specified format, convert them into the necessary files and then
+it will save the results in the last directory you provide.
+
+Use the following command to get help with the tool.
+
 ```
 tsto2rgb --help
 ```
 
-The convert tool will receive a list of directories to search for the image files of specified format, convert them into rgb files and then
-it will save the results in the last directory you provide. For example, supposing the image files are inside a directory called 'img_dir' and you want the images to be exported to the 'destination' directory, you would issue the following command:
+### Making RGB assets
+
+To create rgb assets use the --rgb [-r] option and provide a list of directories where the images you want to convert into rgb are located. After that, use the --output [-o] option and provide
+where the resulting files will be saved into.
 
 ```
-tsto2rgb path/to/img_dir path/to/destination
-```
-## Arguments
-
-If you prefer to use a different type of image instead of png, you can use the --input_extension argument.
-
-```
-tsto2rgb --input_extension webp path/to/img_dir path/to/destination
+tsto2rgb -r /path/to/images -o /path/to/new-rgb-images/
 ```
 
-You can also choose the depth of the image. Choose between 4 (default for in-game sprites) or 8 bits (e.g. a splashscreen) per channel.
+You can also choose the depth of the image. Use --depth [-d] to choose between 4 (default for in-game sprites) or 8 bits (e.g. a splashscreen) per channel.
+The example bellow uses depth 8 which is useful for creating splashscreen assets.
 
 ```
-tsto2rgb --depth 8 path/to/img_dir path/to/destination
+tsto2rgb -d 8 -r /path/to/images -o /path/to/new-rgb-images/
 ```
+
+### Making BSV3 assets
+
+Following with the same logic as for making rgb, you will use --bsv [-b] option followed by a list of directories with your buildings, decorations, etc. Beware that each directory you provide as an argument to this option must
+be associated with **only one** entity (i.e., a building or a decoration). They also must follow the following structure. Note! The names used bellow are placeholders.
+
+* nameofthebuilding/
+  * StateNameA/
+      * 0.png
+      * 1.png
+      * ...
+  * StateNameB/
+  * StateNameC/
+
+That is, nameofthebuilding will be a directory named with the name of your building (prefer to use non spaced lowercase names here).
+Within nameofthebuilding directory you should have subdirectories each corresponding to one state/animation your building has. For example, usually all buildings
+have a Neutral animation. For example, imagine you have a static building with just one frame (no animations at all) and you decided to call it "Brand New Building" (this is just the formal name).
+Here's how you would structure your building:
+
+* brandnewbuilding/
+  * Neutral/
+    * 0.png
+
+So you have a directory named brandnewbuilding. Within that directory you have another directory called Neutral (because your building only have a neutral state). Finally you have all your images
+for that state within the Neutral directory itself. In this specific example you would have one frame that's named 0.png.
 
 ## Multiple directories
 
