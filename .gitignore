@@ -165,3 +165,4 @@ app.py
 *.un~
 *~
 *.vim
+images/

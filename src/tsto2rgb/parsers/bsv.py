@@ -26,7 +26,7 @@ def get_dicer_path():
     return next(dicer)
 
 
-def set_properties(directory, target, depth=4, alpha=255):
+def set_properties(directory, target, depth=4, alpha=1.0):
     building_definitions = Path(target, directory.name + ".xml")
 
     # Get current values.
@@ -53,7 +53,6 @@ def set_properties(directory, target, depth=4, alpha=255):
             definitions[key] = root.get(key, value)
 
 
-    print(definitions)
     root = ET.Element("Building", definitions)
     tree = ET.ElementTree(root)
     ET.indent(tree, "  ")
@@ -129,7 +128,7 @@ def dicer_parser(atlas_width, atlas_height, sprites, offsetX, offsetZ):
         return (frames, cells_list, animations)
 
 
-def bsv3_259(target, frames, cells, animations, alpha=255):
+def bsv3_259(target, frames, cells, animations, alpha=1.0):
     with open(target, "wb") as f:
         # Write file signature.
         f.write(b"\x03\x01")
@@ -138,6 +137,7 @@ def bsv3_259(target, frames, cells, animations, alpha=255):
         f.write(len(cells).to_bytes(2, "little"))
 
         # Alpha flag.
+        alpha = int(alpha * 255)
         alpha_flag = alpha < 255
         f.write(alpha_flag.to_bytes())
 
@@ -279,7 +279,7 @@ def bsv_gen(directories, target, total, input_extension, depth, alpha):
         building_definitions = set_properties(directories[i], target, depth, alpha)
         root = ET.parse(building_definitions).getroot()
         status, reason = bsv_parser(
-            get_dicer_path(), directories[i], building_definitions, target, float(root.get("offsetX")), float(root.get("offsetZ")), int(root.get("depth")), int(root.get("alpha"))
+            get_dicer_path(), directories[i], building_definitions, target, float(root.get("offsetX")), float(root.get("offsetZ")), int(root.get("depth")), float(root.get("alpha"))
         )
         if status is False:
             invalid_directories.append(directories[i].name + f": {reason}")

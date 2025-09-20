@@ -39,9 +39,9 @@ def main():
     parser.add_argument(
         "-a",
         "--alpha",
-        help="Alpha used for the bsv assets (0-255).",
-        default=255,
-        type=int,
+        help="Alpha used for the bsv assets (0.0-1.0).",
+        default=1.0,
+        type=float,
     )
 
     parser.add_argument(
