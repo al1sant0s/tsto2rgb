@@ -118,12 +118,31 @@ tsto2rgb -b Stage/simpsonshouse/ -o 4_70_NewHorizons/NewHorizons-BuildDecoGame-1
 
 <img width="730" height="431" alt="image" src="https://github.com/user-attachments/assets/3e85b02c-2707-4004-96b8-b9377a51001a" />
 
-In this example I'm saving the produced assets into the directory of a new DLC called  _4_70_NewHorizons_. To actually see those assets in game it's required to pack them as DLC and
-modify the gamescripts to load them in game. This process is out of the scope of this guide though.
+In this example I'm saving the new created assets into the directory of a custom DLC called _4_70_NewHorizons_. To actually see those assets in game it's necessary to pack them as DLC and
+modify the gamescripts to load them. The way to do this is way beyond the scope of this guide so it will not be shown. The focus here is to produce the assets and how to use the tsto2rgb to modify the way they look in game.
 
-Now! Here are the files that were made for the Simpsons house:
+With that said, here are the new files that were made for the Simpsons house:
 
 <img width="815" height="298" alt="image" src="https://github.com/user-attachments/assets/c1927350-e56d-4bc1-a5de-0979f4e40df9" />
+
+The image data is located in the rgb and bsv3 files. The 3rd file called simpsonshouse.xml is where you will configure your buildings characteristics. The default configuration of this
+file and for any new building you create a bsv3 asset for will looks like this
+
+```
+<Building x="5" z="5" height="3.5" locX="1" locY="5" transImageX="0.0" transImageY="0.0" offsetX="0" offsetZ="0" depth="4" alpha="255" />
+```
+
+Here you have several attributes. All attributes, except the last 4 attributes, are used by the game.
+OffsetX, offsetZ, depth and alpha are used by tsto2rgb itself.
+
+Before explaing this line of xml furhter let's see how the Simpsons house looks in game. After doing the necessary modifications in gamescripts and have used [tstodlc](https://github.com/al1sant0s/tstodlc/) to install the _4_70_NewHorizons_ DLC into my local gameserver DLC repository. Here's the _not really_ new Simpsons house in game.
+
+<img width="2050" height="1166" alt="image" src="https://github.com/user-attachments/assets/9195916b-9dd0-42cd-a50f-d25bb7a845b5" />
+
+Lots of wrong things here. First the building itself doesn't lay onto that green rectangle. The green rectangle represents the real position of the building so the sprite should be drawn correctly above it.
+
+
+
 
 
 ## Multiple directories
