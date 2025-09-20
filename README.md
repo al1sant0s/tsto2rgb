@@ -102,12 +102,14 @@ Without getting into too much details, you will see:
 
 Here's an screenshot of the Active subdirectory from my filesystem:
 
-<img width="2050" height="1166" alt="img-house" src="https://github.com/user-attachments/assets/7af9c6c8-ffeb-40d7-8b44-bc03d8b5e5bc" />
+<img width="2050" height="1166" alt="image" src="https://github.com/user-attachments/assets/ea66bde8-beed-4884-87c9-fa6a0d8e4f24" />
+
 
 Notice how the frames are numbered. That's a way to enforce their correct order. Now it's time to actually make those images into the required assets for an actual building. Confirming the strucuture above,
 here's how the files should be stuctured.
 
-<img width="1915" height="296" alt="image" src="https://github.com/user-attachments/assets/7e99c213-f43d-4fd9-9b20-f493cf1970ad" />
+<img width="814" height="404" alt="image" src="https://github.com/user-attachments/assets/27f10fa4-cd0e-4ef9-9d77-c5ef4b3da963" />
+
 
 
 Now with the folowing command I run, the corresponding rgb and bsv3 files will be made for the Simpsons house. 
