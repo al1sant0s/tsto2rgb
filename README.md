@@ -60,21 +60,30 @@ tsto2rgb -b /path/to/building01 /path/to/building02 -o /path/to/new-bsv/
 Beware that each directory you provide as an argument to -b option option must:
 
 1. represent **only one** entity (i.e., a building or a decoration);
-2. follow this specific file structure. Note! The names used bellow are placeholders:
+2. follow the specific file structure presented bellow. **Note! The names used here are just placeholders:**
    * nameofthebuilding/
      * StateNameA/
          * 0.png
          * 1.png
          * ...rest of the image files...
      * StateNameB/
+         * 0.png
+         * 1.png
+         * ...rest of the image files...
      * StateNameC/
+         * 0.png
+         * 1.png
+         * ...rest of the image files...
 3. only contain images that all share the same dimensions. This is quite an important point and it's necessary to avoid your buildings "wobbling"
    when their animations are shown in game.
 
 That is, nameofthebuilding will be a directory named with the name of your building (prefer to use non spaced lowercase names here).
-Within nameofthebuilding directory you should have subdirectories each corresponding to one animation (also called state) your building has. 
+Within nameofthebuilding directory you should have subdirectories each corresponding to one animation (also called state) your building has.
+Within each animation subdirectory you should actually have the frames for that animation. All the images from all animations subdirectories must convey
+to the same dimensions. Think of passing your images like a slideshow, they must be properly aligned to avoid a wobbling effect.
 
-Usually all buildings have a Neutral animation. For example, imagine you have a static building i.e. just one frame (no animations), and you decided to call it "Brand New Building" (this is just the formal name).
+Usually when it comes to the animations subdirectories names all buildings have a Neutral animation.
+For example, imagine you have a static building i.e. just one frame (no animations), and you decided to call it "Brand New Building" (this is just the formal name).
 Here's how you would structure your building:
 
 * brandnewbuilding/
@@ -82,9 +91,9 @@ Here's how you would structure your building:
     * 0.png
 
 So you have a directory named brandnewbuilding. Within that directory you have another directory called Neutral (because your building only has a neutral animation). Finally you have all your images
-for that animation within the Neutral directory itself. In this specific example you would have one frame that's named 0.png.
+for that animation within the Neutral directory itself. In this specific example you would have just one frame that's named 0.png.
 
-Now for a real example. Suppose you have been tasked with implementing the "Simpsons House". I know! That building already exists in the game but let's pretend it doesn't (as strange as it sounds).
+Now for a reala and more complex example. Suppose you have been tasked with implementing the "Simpsons House". I know! That building already exists in the game but let's pretend it doesn't (as strange as it sounds).
 Taking the real Simpsons house asset from the game you will find out that it's structured like this (the states may not be in this exactly order in the original bsv3 file):
 
 * simpsonshouse/
@@ -106,7 +115,6 @@ Without getting into too much details, you will see:
 Here's an screenshot of the Active subdirectory from my filesystem:
 
 <img width="2050" height="1166" alt="image" src="https://github.com/user-attachments/assets/ea66bde8-beed-4884-87c9-fa6a0d8e4f24" />
-
 
 Notice how the frames are numbered. That's a way to enforce their correct order. Now it's time to actually make those images into the required assets for an actual building. Confirming the strucuture above,
 here's how the files should be stuctured.
