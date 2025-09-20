@@ -214,10 +214,10 @@ Perfect! Now just do this for any other building or decoration you have.
 
 Now it's time to quick explain the remaining attributes:
 
-* height: moves the currency icon above the building vertically;
+* height: moves the currency icon above the building vertically. That's where the dolar sign and thumbs-up icons show up above the buildings;
 * locX and locY: indicates the position where characters fade out or fade in when they reach a certain position relative to the building. That is when they do jobs on that building.
-  locX and locY here are the usual cartesian X and Y, to not be confused with the X axis of offsetX;
-* transImageX and transImageY are offsets to transimages. You only need to worry about this if you have a file called nameofthebuilding_transimage.rgb in your dlc.
+  locX and locY here are the usual cartesian x and y axes, to not be confused with the x axis of offsetX;
+* transImageX and transImageY are offsets for transimages. You only need to worry about this if you have a file called nameofthebuilding_transimage.rgb in your dlc.
 
 ### Making bcell assets
 
