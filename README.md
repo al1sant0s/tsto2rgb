@@ -57,16 +57,19 @@ Following with the same logic as for making rgb, you will use --bsv [-b] option 
 tsto2rgb -b /path/to/building01 /path/to/building02 -o /path/to/new-bsv/
 ```
 
-Beware that each directory you provide as an argument -b option option must
-be associated with **only one** entity (i.e., a building or a decoration). They also must follow the following structure. Note! The names used bellow are placeholders.
+Beware that each directory you provide as an argument to -b option option must:
 
-* nameofthebuilding/
-  * StateNameA/
-      * 0.png
-      * 1.png
-      * ...rest of the image files...
-  * StateNameB/
-  * StateNameC/
+1. represent **only one** entity (i.e., a building or a decoration);
+2. follow this specific file structure. Note! The names used bellow are placeholders:
+   * nameofthebuilding/
+     * StateNameA/
+         * 0.png
+         * 1.png
+         * ...rest of the image files...
+     * StateNameB/
+     * StateNameC/
+3. only contain images that all share the same dimensions. This is quite an important point and it's necessary to avoid your buildings "wobbling"
+   when their animations are shown in game.
 
 That is, nameofthebuilding will be a directory named with the name of your building (prefer to use non spaced lowercase names here).
 Within nameofthebuilding directory you should have subdirectories each corresponding to one animation (also called state) your building has. 
@@ -111,7 +114,6 @@ here's how the files should be stuctured.
 <img width="814" height="404" alt="image" src="https://github.com/user-attachments/assets/27f10fa4-cd0e-4ef9-9d77-c5ef4b3da963" />
 
 
-
 Now with the folowing command I run, the corresponding rgb and bsv3 files will be made for the Simpsons house. 
 
 ```
@@ -141,7 +143,10 @@ Before explaing this line of xml furhter let's see how the Simpsons house looks 
 
 <img width="2050" height="1166" alt="image" src="https://github.com/user-attachments/assets/9195916b-9dd0-42cd-a50f-d25bb7a845b5" />
 
-Lots of wrong things here. First the building itself doesn't lay onto that green rectangle. The green rectangle represents the real position of the building so the sprite should be drawn correctly above it.
+Wow! Lots of wrong things here. First the building itself doesn't lay onto that green rectangle. The green rectangle represents the real position of the building so the sprite should be drawn correctly above it.
+Also you can clearly see how the green rectangle is not big enough to acomodate the whole Simpsons house foundation.
+
+To fix this we need to edit 4 attributes in simpsonshouse.xml.
 
 
 
