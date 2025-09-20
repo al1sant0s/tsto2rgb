@@ -154,7 +154,11 @@ Before explaing this line of xml furhter let's see how the Simpsons house looks 
 Wow! Lots of wrong things here. First the building itself doesn't lay onto that green rectangle. The green rectangle represents the real position of the building so the sprite should be drawn correctly above it.
 Also you can clearly see how the green rectangle is not big enough to acomodate the whole Simpsons house foundation.
 
-To fix this we need to edit 4 attributes in simpsonshouse.xml.
+To fix this we need to edit 4 attributes in simpsonshouse.xml. The attributes "x" and "z" controls the dimensions of the green rectangle while "offsetX" and "offsetZ" state offsets for the postion where the sprite is being drawn.
+Our mission here is to come up with the appropriate values for those 4 attributes so the building lays on a correct sized green rectangle when selected in rearrange mode (the mode where you move buildings in game).
+
+Let's start first by fixing the green rectangle by editing "x" and "z" attributes. We need to go to where rgb/bsv3/xml files were saved and edit the xml file (in this case simpsonshouse.xml).
+
 
 
 
