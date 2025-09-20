@@ -192,14 +192,9 @@ and here how it looks in game now
 <img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/d483445d-f34f-47de-8c3f-90b78ed9b5bf" />
 
 Much better right?! Now to fix the offsets by editing "offsetX" and "offsetZ" attributes so the house appears above the rectangle.
-Here is the file currently
-
-<img width="2050" height="1166" alt="image" src="https://github.com/user-attachments/assets/a46d332e-e752-430c-b360-d3221bbb330d" />
-
 Each offset attribute moves with positive values according to the following axes:
 
 <img width="2248" height="1385" alt="final_grid" src="https://github.com/user-attachments/assets/22727e17-5b1d-4ece-9126-4cbc07513438" />
-
 
 Unfortunatelly, guessing the correct values is done with trial and error. So at this point it's up to you to throw values in there, rerun the tsto2rgb command to remake the assets and reinstall the DLC with
 the new rgb/bsv3/xml files and check how they look in game. Rise and repeat until you get with a desired result. Also when reruning tsto2rgb command it's quite important
