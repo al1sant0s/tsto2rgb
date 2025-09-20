@@ -157,11 +157,16 @@ Also you can clearly see how the green rectangle is not big enough to acomodate 
 To fix this we need to edit 4 attributes in simpsonshouse.xml. The attributes "x" and "z" controls the dimensions of the green rectangle while "offsetX" and "offsetZ" state offsets for the postion where the sprite is being drawn.
 Our mission here is to come up with the appropriate values for those 4 attributes so the building lays on a correct sized green rectangle when selected in rearrange mode (the mode where you move buildings in game).
 
-Let's start first by fixing the green rectangle by editing "x" and "z" attributes. We need to go to where rgb/bsv3/xml files were saved and edit the xml file (in this case simpsonshouse.xml).
+Let's start first by fixing the offsets by editing "offsetX" and "offsetZ" attributes so the house appears above the rectangle. We need to go to where the rgb/bsv3/xml files were saved and edit the xml file (in this case simpsonshouse.xml).
+Here is the file currently
 
+<img width="2050" height="1166" alt="image" src="https://github.com/user-attachments/assets/a46d332e-e752-430c-b360-d3221bbb330d" />
 
+Each offset attribute moves with positive values according to the following axes:
 
+<img width="2248" height="1385" alt="final_grid" src="https://github.com/user-attachments/assets/22727e17-5b1d-4ece-9126-4cbc07513438" />
 
+Unfortunatelly, guessing the correct values is done with trial and error.
 
 
 ## Multiple directories
