@@ -1,5 +1,7 @@
+import platform
 import json
 import os
+import shutil
 import subprocess
 import tempfile
 import numpy as np
@@ -17,40 +19,49 @@ from tsto2rgb.tools import (
     report_progress,
 )
 
-dicer = Path(Path(__file__).parent, "dicer", "linux")
+
+def get_dicer_path():
+    os_name = platform.system().lower()
+    dicer = Path(Path(__file__).parent, "dicer").glob(f"dice-{os_name}-x64")
+
+    return next(dicer)
 
 
-def get_properties(directory, depth=4, alpha=255):
-    definitions = Path(directory, "definitions.xml")
+def set_properties(directory, target, depth=4, alpha=255):
+    building_definitions = Path(target, directory.name + ".xml")
 
     # Get current values.
-    offsetX = 0
-    offsetZ = 0
-    if definitions.exists() is True:
-        tree = ET.parse(definitions)
+    definitions = {
+        "x": "5",
+        "z": "5",
+        "height": "3.5",
+        "locX": "1",
+        "locY": "5",
+        "transImageX": "0.0",
+        "transImageY": "0.0",
+        "offsetX": "0",
+        "offsetZ": "0",
+        "depth": str(depth),
+        "alpha": str(alpha)
+    }
+
+    # Read existing file to update default attribute values and include missing attributes.
+    if building_definitions.exists() is True:
+        tree = ET.parse(building_definitions)
         root = tree.getroot()
 
-        offsetX = float(root.attrib.get("offsetX", offsetX))
-        offsetZ = float(root.attrib.get("offsetZ", offsetZ))
-        depth = int(root.attrib.get("depth", depth))
-        alpha = int(root.attrib.get("alpha", alpha))
+        for key, value in definitions.items():
+            definitions[key] = root.get("key", value)
 
-    # Rewrite file to include any missing attributes.
-    root = ET.Element(
-        "Definitions",
-        {
-            "offsetX": str(offsetX),
-            "offsetZ": str(offsetZ),
-            "depth": str(depth),
-            "alpha": str(alpha),
-        },
-    )
+
+    root = ET.Element("Building", definitions)
     tree = ET.ElementTree(root)
     ET.indent(tree, "  ")
-    with open(definitions, "wb") as xml_file:
+    with open(building_definitions, "wb") as xml_file:
         tree.write(xml_file)
 
-    return (offsetX, offsetZ, depth, alpha)
+
+    return building_definitions
 
 
 def dicer_parser(atlas_width, atlas_height, sprites, offsetX, offsetZ):
@@ -132,7 +143,7 @@ def bsv3_259(target, frames, cells, animations, alpha=255):
 
         # Write cellnames and positions.
         for i in range(len(cells)):
-            cellname = f"C_cell_{i:02d}"
+            cellname = f"C_{target.stem}_{i:02d}"
             cell = cells[i]
             x, y, w, h = cell
 
@@ -184,7 +195,7 @@ def bsv3_259(target, frames, cells, animations, alpha=255):
 #                        img.composite(clone, x, y)
 
 
-def bsv_parser(directory, target, offsetX, offsetZ, depth, alpha):
+def bsv_parser(dicer_path, directory, building_definitions, target, offsetX, offsetZ, depth, alpha):
     # First check if there are subdirectories there.
     subdirectories = [
         subdirectory
@@ -194,10 +205,10 @@ def bsv_parser(directory, target, offsetX, offsetZ, depth, alpha):
     if len(subdirectories) > 0:
         with tempfile.TemporaryDirectory() as tempdir:
             dicer_args = [
-                dicer,
+                dicer_path,
                 "--square",
                 "-l",
-                "2048",
+                "8192",
                 "-o",
                 tempdir,
                 "-r",
@@ -248,26 +259,6 @@ def bsv_parser(directory, target, offsetX, offsetZ, depth, alpha):
                             alpha,
                         )
 
-                        # Required in game xml file.
-                        building = Path(target, directory.name + ".xml")
-                        if building.exists() is False:
-                            root = ET.Element(
-                                "Building",
-                                attrib={
-                                    "x": "5",
-                                    "z": "5",
-                                    "height": "3.5",
-                                    "locX": "1",
-                                    "locY": "5",
-                                    "transImageX": "0.0",
-                                    "transImageY": "0.0",
-                                },
-                            )
-                            tree = ET.ElementTree(root)
-                            ET.indent(tree, "  ")
-                            with open(building, "wb") as xml_file:
-                                tree.write(xml_file)
-
                     return (True, "")
             else:
                 return (False, "Dicer failed!")
@@ -285,9 +276,10 @@ def bsv_gen(directories, target, total, input_extension, depth, alpha):
             "",
             styles["normal"],
         )
-        offsetX, offsetZ, depth, alpha = get_properties(directories[i], depth, alpha)
+        building_definitions = set_properties(directories[i], target, depth, alpha)
+        root = ET.parse(building_definitions).getroot()
         status, reason = bsv_parser(
-            directories[i], target, offsetX, offsetZ, depth, alpha
+            get_dicer_path(), directories[i], building_definitions, target, float(root.get("offsetX")), float(root.get("offsetZ")), int(root.get("depth")), int(root.get("alpha"))
         )
         if status is False:
             invalid_directories.append(directories[i].name + f": {reason}")
