@@ -1,6 +1,6 @@
-# Convert image files to RGB/BSV3/BCELL files for TSTO
+# Convert image files files for TSTO
 
-This package allows you to convert images into RGB/BSV3/BCELL assets for the 'The Simpsons: Tapped Out' game.
+This package allows you to convert images into rgb/bsv3/bcellL assets for the 'The Simpsons: Tapped Out' game.
 It uses [**ImageMagick**](https://imagemagick.org/) to perform the conversions and (**sprite-dicing**)[https://github.com/elringus/sprite-dicing] under the hood.
 
 ## Installation
@@ -33,7 +33,7 @@ Use the following command to get help with the tool.
 tsto2rgb --help
 ```
 
-### Making RGB assets
+### Making rgb assets
 
 To create rgb assets use the --rgb [-r] option and provide a list of directories where the images you want to convert into rgb are located. After that, use the --output [-o] option and provide
 where the resulting files will be saved into.
@@ -49,7 +49,7 @@ The example bellow uses depth 8 which is useful for creating splashscreen assets
 tsto2rgb -d 8 -r /path/to/images -o /path/to/new-rgb-images/
 ```
 
-### Making BSV3 assets
+### Making bsv3 assets
 
 Following with the same logic as for making rgb, you will use --bsv [-b] option followed by a list of directories with your buildings, decorations, etc. As before specify the output directory at the end of the command.
 
@@ -212,7 +212,7 @@ and here how it looks now
 
 Perfect! Now just do this for any other building or decoration you have.
 
-### Making Bcell assets
+### Making bcell assets
 
 > WIP
 
