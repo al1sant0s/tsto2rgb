@@ -8,8 +8,8 @@ It uses [**ImageMagick**](https://imagemagick.org/) to perform the conversions a
 * [Installation](https://github.com/al1sant0s/tsto2rgb?tab=readme-ov-file#installation)
 * [Basic usage](https://github.com/al1sant0s/tsto2rgb?tab=readme-ov-file#usage)
 * [making rgb](https://github.com/al1sant0s/tsto2rgb?tab=readme-ov-file#making-rgb-assets)
-* [making bsv3](https://github.com/al1sant0s/tsto2bsv3?tab=readme-ov-file#making-bsv3-assets)
-* [making bcell](https://github.com/al1sant0s/tsto2bcell?tab=readme-ov-file#making-bcell-assets)
+* [making bsv3](https://github.com/al1sant0s/tsto2rgb?tab=readme-ov-file#making-bsv3-assets)
+* [making bcell](https://github.com/al1sant0s/tsto2rgb?tab=readme-ov-file#making-bcell-assets)
 
 ## Installation
 
