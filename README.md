@@ -7,9 +7,9 @@ It uses [**ImageMagick**](https://imagemagick.org/) to perform the conversions a
 
 * [Installation](https://github.com/al1sant0s/tsto2rgb?tab=readme-ov-file#installation)
 * [Basic usage](https://github.com/al1sant0s/tsto2rgb?tab=readme-ov-file#usage)
-* [making rgb](https://github.com/al1sant0s/tsto2rgb?tab=readme-ov-file#making-rgb-assets)
-* [making bsv3](https://github.com/al1sant0s/tsto2rgb?tab=readme-ov-file#making-bsv3-assets)
-* [making bcell](https://github.com/al1sant0s/tsto2rgb?tab=readme-ov-file#making-bcell-assets)
+* [rgb](https://github.com/al1sant0s/tsto2rgb?tab=readme-ov-file#making-rgb-assets)
+* [bsv3](https://github.com/al1sant0s/tsto2rgb?tab=readme-ov-file#making-bsv3-assets)
+* [bcell](https://github.com/al1sant0s/tsto2rgb?tab=readme-ov-file#making-bcell-assets)
 
 ## Installation
 
@@ -50,11 +50,11 @@ where the resulting files will be saved.
 tsto2rgb -r /path/to/images -o /path/to/new-rgb-images/
 ```
 
-You can also choose the depth of the image. Use --depth [-d] to choose between 4 (default for in-game sprites) or 8 bits (e.g. a splashscreen) per channel.
+You can also choose the depth of the image. Use --depth  to choose between 4 (default for in-game sprites) or 8 bits (e.g. a splashscreen) per channel.
 The example below uses depth 8, which is useful for creating splashscreen assets.
 
 ```
-tsto2rgb -d 8 -r /path/to/images -o /path/to/new-rgb-images/
+tsto2rgb --depth 8 -r /path/to/images -o /path/to/new-rgb-images/
 ```
 
 ### Making bsv3 assets
@@ -314,7 +314,7 @@ Do that until you end up with the desired results.
 
 ### Grouping images
 
-Set the --group argument to organise the images in subdirectories within the destination directory.
+Set the --group [-g] argument to organise the images in subdirectories within the destination directory.
 Each subdirectory corresponds to a certain entity. For example, if there were two image files in 'img_dir', one named
 'yellowhouse.png' and the other named 'orangehouse.png', the destination directory would have the following structure after the conversion:
 
@@ -337,5 +337,25 @@ For example, given the name 'something_anything_else.png', _something_ is the en
 When a file corresponding to an entity doesn't specify a variation (a filename without an underscore in it like 'orangehouse.png') the _default variation subdirectory will be created.
 
 ```
-tsto2rgb --group -r path/to/Images -o path/to/results
+tsto2rgb -g -r path/to/Images -o path/to/results
+```
+
+## Additional options
+
+You can specify a default depth with the --depth option.
+
+```
+tsto2rgb --depth 8 -r /path/to/images -o /path/to/rgbs/
+```
+
+You can specify a default alpha with the --alpha [-a] option to use with the bsv3 files. The alpha must be a decimal number between 0.0 (fully transparent) and 1.0 (fully opaque).
+
+```
+tsto2rgb -a 1.0 -r /path/to/images -o /path/bsv3s/
+```
+
+You can specify a default delay with the --delay [-d] option. The delay can be a decimal number and must be specified in milliseconds terms.
+
+```
+tsto2rgb -d 41.68 -r /path/to/images -o /path/bcells/
 ```
