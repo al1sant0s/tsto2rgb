@@ -29,7 +29,6 @@ def main():
     )
 
     parser.add_argument(
-        "-d",
         "--depth",
         help="Depth used for the image (choose between 4 and 8 bits per channel).",
         default=4,
@@ -45,7 +44,7 @@ def main():
     )
 
     parser.add_argument(
-        "-t",
+        "-d",
         "--delay",
         help="""
         Delay in miliseconds used for the frames in a new bcell asset. This value will only
