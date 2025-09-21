@@ -220,7 +220,51 @@ Now it's time to quickly explain the remaining attributes:
 
 ### Making bcell assets
 
-> WIP
+This works really similar to making bsv3 assets. This time you use the --cell [-c] option instead.
+
+```
+tsto2rgb -c /path/to/character01 /path/to/character02 -o /path/to/new-bcell/
+```
+Beware that each directory you provide as an argument to -c option must:
+
+1. represent **only one** entity (i.e., a character or a NPC);
+2. follow the specific file structure presented below. **Note! The names used here are just placeholders:**
+   * nameofthecharacter/
+     * animation_name_a/
+         * 0.png
+         * 1.png
+         * ...rest of the image files...
+     * animation_name_b/
+         * 0.png
+         * 1.png
+         * ...rest of the image files...
+     * animation_name_c/
+         * 0.png
+         * 1.png
+         * ...rest of the image files...
+3. within each animation subdirectory only contain images that all share the same dimensions. This is quite an important point, and it's necessary to avoid your characters "wobbling"
+   when their animations are shown in game.
+4. the images must be named in a way that they are listed in the correct order. You can simply name them with natural numbers if you wish. You can also prepend
+   them with an preffix like "frame_" e.g. frame_00.png, frame_01.png, etc.
+
+To further elaborate on the previous points, nameofthecharacter will be a directory named with the name of your character (prefer to use non-spaced lowercase names here).
+Within the nameofthecharacter directory you should have subdirectories each corresponding to one animation your character has.
+Within each animation subdirectory, you should actually have the frames for that animation. All the images from each animation subdirectory must convey
+to the same dimensions. Think of passing your images like a slideshow, they must be properly aligned to avoid a wobbling effect. Finally, name your frames in a way
+that indicates some kind of order. If you name your frames in such a manner that your file explorer software lists them in the desired order, then this is correct.
+
+Usually, when it comes to the animations subdirectories, all characters have the following animations.
+
+* character/
+  * back_walk/
+  * front_walk/
+  * idle/
+  * idle_blink/
+  * victory_pose/
+
+Now, for a real and slightly more complex showcase, it's time to demonstrate how to implement a real character in game. For this example, Homer Simpson will be used. The files to reproduce this example
+will not be provided by this guide, but you can just reproduce the next steps to any other character/NPC you wish to implement for the game, so pay close attention!
+
 
 ### Grouping images
 
