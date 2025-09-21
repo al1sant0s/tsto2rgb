@@ -47,14 +47,14 @@ To create rgb assets, use the --rgb [-r] option and provide a list of directorie
 where the resulting files will be saved.
 
 ```
-tsto2rgb -r /path/to/images/ -o /path/to/rgbs/
+tsto2rgb -r path/to/images -o /path/to/rgbs
 ```
 
 You can also choose the depth of the image. Use --depth  to choose between 4 (default for in-game sprites) or 8 bits (e.g. a splashscreen) per channel.
 The example below uses depth 8, which is useful for creating splashscreen assets.
 
 ```
-tsto2rgb --depth 8 -r /path/to/images/ -o /path/to/rgbs/
+tsto2rgb --depth 8 -r path/to/images -o /path/to/rgbs
 ```
 
 ### Making bsv3 assets
@@ -62,7 +62,7 @@ tsto2rgb --depth 8 -r /path/to/images/ -o /path/to/rgbs/
 Following the same logic as for making rgb, you will use --bsv [-b] option followed by a list of directories with your buildings, decorations, etc. As before, specify the output directory at the end of the command.
 
 ```
-tsto2rgb -b /path/to/building01/ /path/to/building02/ -o /path/to/bsv3s/
+tsto2rgb -b path/to/building01 path/to/building02 -o path/to/bsv3s
 ```
 
 Beware that each directory you provide as an argument to -b option must:
@@ -231,7 +231,7 @@ Now it's time to quickly explain the remaining attributes:
 This works really similar to making bsv3 assets. This time you use the --cell [-c] option instead.
 
 ```
-tsto2rgb -c /path/to/character01/ /path/to/character02/ -o /path/to/bcells/
+tsto2rgb -c path/to/character01 path/to/character02 -o path/to/bcells
 ```
 Beware that each directory you provide as an argument to -c option must:
 
@@ -286,7 +286,7 @@ For example, here's how Homer Simpson animations could be structured:
 That is a directoy named homer and within that directory you have all animations of that character. After running the command
 
 ```
-tsto2rgb -c /path/to/homer/ -o /path/to/homer_assets/
+tsto2rgb -c path/to/homer -o path/to/homer_assets
 ```
 
 the following files will be created for each animation:
@@ -337,7 +337,7 @@ For example, given the name 'something_anything_else.png', _something_ is the en
 When a file corresponding to an entity doesn't specify a variation (a filename without an underscore in it like 'orangehouse.png') the _default variation subdirectory will be created.
 
 ```
-tsto2rgb -g -r path/to/Images/ -o path/to/results/
+tsto2rgb -g -r path/to/Images -o path/to/results
 ```
 
 ## Additional options
@@ -345,17 +345,17 @@ tsto2rgb -g -r path/to/Images/ -o path/to/results/
 You can specify a default depth with the --depth option.
 
 ```
-tsto2rgb --depth 8 -r /path/to/images/ -o /path/to/rgbs/
+tsto2rgb --depth 8 -r path/to/images -o path/to/rgbs
 ```
 
 You can specify a default alpha with the --alpha [-a] option to use with the bsv3 files. The alpha must be a decimal number between 0.0 (fully transparent) and 1.0 (fully opaque).
 
 ```
-tsto2rgb -a 1.0 -r /path/to/images/ -o /path/bsv3s/
+tsto2rgb -a 1.0 -r path/to/images -o path/bsv3s
 ```
 
 You can specify a default delay with the --delay [-d] option. The delay can be a decimal number and must be specified in milliseconds terms.
 
 ```
-tsto2rgb -d 41.68 -r /path/to/images/ -o /path/bcells/
+tsto2rgb -d 41.68 -r path/to/images -o path/bcells
 ```
