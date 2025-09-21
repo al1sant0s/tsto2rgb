@@ -11,7 +11,7 @@ It uses [**ImageMagick**](https://imagemagick.org/) to perform the conversions a
 * [bsv3](https://github.com/al1sant0s/tsto2rgb?tab=readme-ov-file#making-bsv3-assets)
 * [bcell](https://github.com/al1sant0s/tsto2rgb?tab=readme-ov-file#making-bcell-assets)
 * [Grouping Images](https://github.com/al1sant0s/tsto2rgb?tab=readme-ov-file#grouping-images)
-* [Additional Options](https://github.com/al1sant0s/tsto2rgb?tab=readme-ov-file#additional-opitions)
+* [Additional Options](https://github.com/al1sant0s/tsto2rgb?tab=readme-ov-file#additional-options)
 
 ## Installation
 
