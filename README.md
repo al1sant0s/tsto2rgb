@@ -1,4 +1,4 @@
-# Convert image files files for TSTO
+# Convert image files for TSTO
 
 This package allows you to convert images into rgb/bsv3/bcell assets for the 'The Simpsons: Tapped Out' game.
 It uses [**ImageMagick**](https://imagemagick.org/) to perform the conversions and [**sprite-dicing**](https://github.com/elringus/sprite-dicing) under the hood.
@@ -197,7 +197,7 @@ Each offset attribute moves with positive values according to the following axes
 <img width="2248" height="1385" alt="final_grid" src="https://github.com/user-attachments/assets/22727e17-5b1d-4ece-9126-4cbc07513438" />
 
 Unfortunatelly, guessing the correct values is done with trial and error. So at this point it's up to you to throw values in there, rerun the tsto2rgb command to remake the assets and reinstall the DLC with
-the new rgb/bsv3/xml files and check how they look in game. Rise and repeat until you get with a desired result. Also when reruning tsto2rgb command it's quite important
+the new rgb/bsv3/xml files and check how they look in game. Rise and repeat until you end up with a desired result. Also when reruning tsto2rgb command it's quite important
 that you point it to save to the same place where your current resulting rgb/bsv3/xml files are because it will retrieve the offsets and other attributes from there and embed them into the newest bsv3 file.
 
 In this case the following values did the trick.
