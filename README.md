@@ -248,9 +248,12 @@ Beware that each directory you provide as an argument to -c option must:
    them with an preffix like "frame_" e.g. frame_00.png, frame_01.png, etc.
 
 To further elaborate on the previous points, nameofthecharacter will be a directory named with the name of your character (prefer to use non-spaced lowercase names here).
+
 Within the nameofthecharacter directory you should have subdirectories each corresponding to one animation your character has.
-Within each animation subdirectory, you should actually have the frames for that animation. All the images from each animation subdirectory must convey
-to the same dimensions. Think of passing your images like a slideshow, they must be properly aligned to avoid a wobbling effect. Finally, name your frames in a way
+
+Within each animation subdirectory, you should actually have the frames for that animation. 
+
+All the images from each animation subdirectory must convey to the same dimensions. Think of passing your images like a slideshow, they must be properly aligned to avoid a wobbling effect. Finally, name your frames in a way
 that indicates some kind of order. If you name your frames in such a manner that your file explorer software lists them in the desired order, then this is correct.
 
 Usually, when it comes to the animations subdirectories, all characters have the following animations.
@@ -262,9 +265,44 @@ Usually, when it comes to the animations subdirectories, all characters have the
   * idle_blink/
   * victory_pose/
 
-Now, for a real and slightly more complex showcase, it's time to demonstrate how to implement a real character in game. For this example, Homer Simpson will be used. The files to reproduce this example
-will not be provided by this guide, but you can just reproduce the next steps to any other character/NPC you wish to implement for the game, so pay close attention!
+For example, here's how Homer Simpson animations could be structured:
 
+* homer/
+  * back_walk/
+  * front_walk/
+  * idle/
+  * idle_blink/
+  * pick_trash_active/
+  * victory_pose/
+
+That is a directoy named homer and within that directory you have all animations of that character. After running the command
+
+```
+tsto2rgb -c /path/to/homer -o /path/to/results
+```
+
+the following files will be created for each animation:
+
+* a bcell file for each animaton of that characater which file name will be made by concatenating  the character name with the animation subdirectory name. Take the animation "back_walk" from Homer. The resulting file will
+  be called "homer_back_walk.bcell";
+
+* a xml file for each animation, where you can provide adjustments like offsets and delays between each frame. The nam of file will be the same as the ".bcell" file name, except that the extension will be ".xml".  For the previous example you would have "homer_back_walk.xml". For context here's how this file might look:
+```
+<AnimSequence offsetX="0" offsetY="0" depth="4">
+  <Cell delay="41.666666666666664" />
+  <Cell delay="41.666666666666664" />
+  <Cell delay="41.666666666666664" />
+  <Cell delay="41.666666666666664" />
+  <Cell delay="41.666666666666664" />
+</AnimSequence>
+```
+
+* a xml file for each character that lists each all those characters animations. For the previous the file would be named "homer.xml".
+
+The process after that is the analog to the one at the bsv3 section. You pack your new asset files for your character with a DLC,
+modify the gamescripts to load your new character, install them into your server DLC repository and check how they look in game.
+Then you adjust the offsets and delays for each animation, rerun tsto2rgb to recreate the bcell files, reinstall the DLC with the new files and verify again how they look.
+Do that until you end up with the desired results.
 
 ### Grouping images
 
