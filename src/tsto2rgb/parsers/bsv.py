@@ -29,8 +29,8 @@ def get_dicer_path():
 def set_properties(directory, target, depth=4, alpha=1.0):
     building_definitions = Path(target, directory.name + ".xml")
 
-    # Get current values.
-    definitions = {
+    # Get default values.
+    defaults = {
         "x": "5",
         "z": "5",
         "height": "3.5",
@@ -49,11 +49,11 @@ def set_properties(directory, target, depth=4, alpha=1.0):
         tree = ET.parse(building_definitions)
         root = tree.getroot()
 
-        for key, value in definitions.items():
-            definitions[key] = root.get(key, value)
+        for key, value in defaults.items():
+            defaults[key] = root.get(key, value)
 
 
-    root = ET.Element("Building", definitions)
+    root = ET.Element("Building", defaults)
     tree = ET.ElementTree(root)
     ET.indent(tree, "  ")
     with open(building_definitions, "wb") as xml_file:
@@ -279,7 +279,7 @@ def bsv_gen(directories, target, total, input_extension, depth, alpha):
         building_definitions = set_properties(directories[i], target, depth, alpha)
         root = ET.parse(building_definitions).getroot()
         status, reason = bsv_parser(
-            get_dicer_path(), directories[i], building_definitions, target, float(root.get("offsetX")), float(root.get("offsetZ")), int(root.get("depth")), float(root.get("alpha"))
+            get_dicer_path(), directories[i], building_definitions, target, float(root.get("offsetX")), float(root.get("offsetZ")), int(root.get("depth")), float(root.get("alpha")) # type: ignore
         )
         if status is False:
             invalid_directories.append(directories[i].name + f": {reason}")

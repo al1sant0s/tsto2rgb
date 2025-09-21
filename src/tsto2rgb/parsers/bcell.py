@@ -14,45 +14,46 @@ from tsto2rgb.tools import (
 )
 
 
-def get_properties(directory, num, depth, time):
-    definitions = Path(directory, "definitions.xml")
+def set_properties(directory, target, num, delay, depth):
+    cell_definitions = Path(target, directory.parent.name + "_" + directory.name + ".xml")
 
-    # Set default values.
-    offsetX = 0
-    offsetY = 0
-    properties = [[time, offsetX, offsetY, depth] for _ in range(num)]
+    # Get default values.
 
-    # Get current values.
-    if definitions.exists() is True:
-        tree = ET.parse(definitions)
-        root = tree.getroot()
+    root_defaults = {
+        "offsetX": "0",
+        "offsetY": "0",
+        "depth": str(depth),
+    }
 
-        for image, i in zip(root.findall("Image"), range(num)):
-            time = float(image.attrib.get("time", time))
-            offsetX = int(image.attrib.get("offsetX", offsetX))
-            offsetY = int(image.attrib.get("offsetY", offsetY))
-            depth = int(image.attrib.get("depth", depth))
+    cell_defaults = {
+        "delay": str(delay),
+    }
 
-            properties[i] = [time, offsetX, offsetY, depth]
-    else:
-        root = ET.Element("Definitions")
-        for i in range(num):
-            ET.SubElement(
-                root,
-                "Image",
-                {
-                    "time": str(properties[i][0]),
-                    "offsetX": str(properties[i][1]),
-                    "offsetY": str(properties[i][2]),
-                    "depth": str(properties[i][3]),
-                },
-            )
-        tree = ET.ElementTree(root)
-        ET.indent(tree, "  ")
-        with open(definitions, "wb") as xml_file:
-            tree.write(xml_file)
+    animseq = ET.Element("AnimSequence", root_defaults)
+    cells = [ET.SubElement(animseq, "Cell", cell_defaults) for _ in range(num)]
 
-    return properties
+    # Read existing file to update default attribute values and include missing attributes.
+    if cell_definitions.exists() is True:
+        root = ET.parse(cell_definitions).getroot()
+
+        for key, value in root_defaults.items():
+            root.attrib[key] = root.get(key, value)
+        animseq.attrib = root.attrib
+
+        for item, cell in zip(root.findall("*"), cells):
+            for key, value in cell_defaults.items():
+                item.attrib[key] = item.get(key, value)
+
+            cell.attrib = item.attrib
+
+
+    tree = ET.ElementTree(animseq)
+    ET.indent(tree, "  ")
+    with open(cell_definitions, "wb") as xml_file:
+        tree.write(xml_file)
+
+
+    return cell_definitions
 
 
 def bcell_parser(img_list, target):
@@ -67,13 +68,13 @@ def bcell_parser(img_list, target):
         # Number of images.
         f.write(len(img_list).to_bytes(2, "little"))
 
-        for img, time, x, y in img_list:
+        for img, delay, x, y in img_list:
             write_str_to_file(
-                f, img.parent.name + f"_{img.stem}.rgb", null_terminated=True
+                f, img.parent.parent.name + "_" + img.parent.name + f"_{img.stem}.rgb", null_terminated=True
             )
 
-            # Write time in miliseconds.
-            f.write(np.array(time, dtype=np.float32).tobytes())
+            # Write delay in miliseconds.
+            f.write(np.array(delay, dtype=np.float32).tobytes())
 
             # X and Y.
             f.write(int.to_bytes(x, 2, "little", signed=True))
@@ -90,52 +91,78 @@ def bcell_parser(img_list, target):
         return (True, "")
 
 
-def bcell_gen(directories, target, total, input_extension, depth, time):
+def bcell_gen(directories, target, total, input_extension, depth, delay):
     generic_header(styles["bcell"], "bcell", total, input_extension, depth)
     generic_body(styles["bcell"])
 
     invalid_directories = []
-    for i in range(total):
-        img_list = natsorted(directories[i].glob(f"*.{input_extension}"))
-        img_filter = list()
+    for directory in directories:
 
-        # Try to convert these images to rgb.
-        for img, item in zip(
-            img_list, get_properties(directories[i], len(img_list), depth, time)
-        ):
-            with Image(filename=img) as main_img:
-                width = main_img.width + (main_img.width % 2 > 0)
-                height = main_img.height + (main_img.height % 2 > 0)
-                time, offsetX, offsetY, img_depth = item
+        subdirectories = [subdirectory for subdirectory in directory.iterdir() if subdirectory.is_dir() is True]
+        subtotal = len(subdirectories)
 
-                with Image(width=width, height=height) as new_img:
-                    new_img.composite(main_img, 0, 0)
+        # Create animation file.
+        animlist = ET.Element("AnimList")
 
-                    x = -new_img.width // 2 + offsetX
-                    y = -new_img.height + offsetY
-                    status = rgb_parser(
-                        new_img,
-                        Path(target, directories[i].name + f"_{img.stem}.rgb"),
-                        img_depth,
+        for i in range(subtotal):
+
+            img_list = natsorted(subdirectories[i].glob(f"*.{input_extension}"))
+            img_filter = list()
+
+            cell_definitions = set_properties(subdirectories[i], target, len(img_list), delay, depth)
+            root = ET.parse(cell_definitions).getroot()
+            cells = [element for element in root.findall("*")]
+
+            # Try to convert these images to rgb.
+            for img, cell in zip(img_list, cells):
+                with Image(filename=img) as main_img:
+                    width = main_img.width + (main_img.width % 2 > 0)
+                    height = main_img.height + (main_img.height % 2 > 0)
+
+                    with Image(width=width, height=height) as new_img:
+                        new_img.composite(main_img, 0, 0)
+
+                        x = -new_img.width // 2 + int(root.attrib["offsetX"])
+                        y = -new_img.height + int(root.attrib["offsetY"])
+                        status = rgb_parser(
+                            new_img,
+                            Path(target, directory.name + "_" + subdirectories[i].name + f"_{img.stem}.rgb"),
+                            int(root.attrib["depth"]),
+                        )
+
+                if status is False:
+                    invalid_directories.append(
+                        img.relative_to(img.parent.parent).name + ": was not converted!"
                     )
+                else:
+                    img_filter.append((img, float(cell.attrib["delay"]), x, y))
 
+            status, reason = bcell_parser(
+                img_filter,
+                Path(target, directory.name + "_" + subdirectories[i].name + ".bcell"),
+            )
+            report_progress(
+                f" * Progress: {(i + 1) * 100 // subtotal:3d}% -> {directory.name + "_" + subdirectories[i].name}.bcell",
+                "",
+                styles["normal"],
+            )
             if status is False:
-                invalid_directories.append(
-                    img.relative_to(img.parent).name + ": was not converted!"
-                )
+                invalid_directories.append(subdirectories[i].name + f": {reason}")
             else:
-                img_filter.append((img, time, x, y))
+                ET.SubElement(
+                    animlist,
+                    "Animation",
+                    {
+                        "name":
+                        "_".join([s.capitalize() for s in subdirectories[i].name.split("_")])
+                    }
+                )
 
-        status, reason = bcell_parser(
-            img_filter,
-            Path(target, directories[i].name + ".bcell"),
-        )
-        report_progress(
-            f" * Progress: {(i + 1) * 100 // total:3d}% -> {directories[i].name}.bcell",
-            "",
-            styles["normal"],
-        )
-        if status is False:
-            invalid_directories.append(directories[i].name + f": {reason}")
+
+        tree = ET.ElementTree(animlist)
+        ET.indent(tree, "  ")
+        with open(Path(target, directory.name + ".xml"), "wb") as xml_file:
+            tree.write(xml_file)
+
 
     generic_footer(styles["bcell"], total, invalid_directories)

@@ -46,16 +46,17 @@ def main():
 
     parser.add_argument(
         "-t",
-        "--time",
+        "--delay",
         help="""
-        Time in miliseconds used for the frames in a new bcell asset. This value will only
+        Delay in miliseconds used for the frames in a new bcell asset. This value will only
         be used if there is no cell.xml file within the source image directory.
         """,
-        default=1000 / 12,
+        default=1000 / 24,
         type=float,
     )
 
     parser.add_argument(
+        "-e",
         "--input_extension",
         help="""
         Image format used for the imported images.
@@ -121,10 +122,10 @@ def main():
 
     bcell_directiories = (
         [
-            Path(item).resolve()
-            for item in args.bcell
-            if Path(item).resolve().is_dir() is True
-            and Path(item).resolve().name not in ("", ".", "..")
+            Path(character).resolve()
+            for character in args.bcell
+            if Path(character).resolve().is_dir() is True
+            and Path(character).resolve().name not in ("", ".", "..")
         ]
         if args.bcell is not None
         else []
@@ -183,7 +184,7 @@ def main():
             bcell_total,
             args.input_extension,
             args.depth,
-            args.time,
+            args.delay,
         )
 
     #    if total == 0:
