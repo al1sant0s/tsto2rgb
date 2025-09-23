@@ -87,7 +87,7 @@ Beware that each directory you provide as an argument to -b option must:
 3. only contain images that all share the same dimensions. This is quite an important point, and it's necessary to avoid your buildings "wobbling"
    when their animations are shown in game.
 4. the images must be named in a way that they are listed in the correct order. You can simply name them with natural numbers if you wish. You can also prepend
-   them with an preffix like "frame_" e.g. frame_00.png, frame_01.png, etc.
+   them with a prefix like "frame_" e.g. frame_00.png, frame_01.png, etc.
 
 To further elaborate on the previous points, nameofthebuilding will be a directory named with the name of your building (prefer to use non-spaced lowercase names here).
 Within the nameofthebuilding directory you should have subdirectories each corresponding to one animation (also called state) your building has.
@@ -122,7 +122,7 @@ The brown house bsv3 file from the game is structured like this (the animations 
   * Neutral/
     * 0.png
 
-Without getting into too much detail, you will see:
+Without getting into too much details, you will see:
 
 * An animation called "Active" that plays on loop when characters are doing jobs in the brown house. For the brown house, you can see a dimming blue light at the window when this animation is playing;
 * The Neutral animation that is actually just one frame, the regular brown house image;
@@ -137,7 +137,7 @@ The brown house is a pretty simple building, but you can find more elaborate bui
   * Eggs/
   * Neutral/
 
-* Active_In is an animation that plays once a character, about to do a job at the Simpsons house, reaches it. If the building is currently playing the Neutral animation, the Active_In animation will be played before
+* Active_In is an animation that plays once a character, about to do a job at the Simpsons house, reaches it. If the building is currently playing the Neutral animation, the Active_In animation will kick in before
   the Active animation starts. In other words, it is the animation that works as a transition between the Neutral and Active animations.
 * Active_Out is an animation that plays once the last character doing a job at the Simpsons house finishes (their thumbs-up icon is tapped by the player). Works as a transition between Active and Neutral animations.
 
@@ -223,7 +223,6 @@ Now it's time to quickly explain the remaining attributes:
 
 * height: moves the currency icon above the building vertically. That's where the dollar sign and thumbs-up icons show up above the buildings;
 * locX and locY: indicate the position where characters fade out or fade in when they reach a certain position relative to the building. That is when they do jobs on that building.
-  locX and locY here are the usual cartesian x and y axes, to not be confused with the x axis of offsetX;
 * transImageX and transImageY are offsets for transimages. You only need to worry about this if you have a file called nameofthebuilding_transimage.rgb in your dlc.
 
 ### Making bcell assets
@@ -253,7 +252,7 @@ Beware that each directory you provide as an argument to -c option must:
 3. within each animation subdirectory only contain images that all share the same dimensions. This is quite an important point, and it's necessary to avoid your characters "wobbling"
    when their animations are shown in game.
 4. the images must be named in a way that they are listed in the correct order. You can simply name them with natural numbers if you wish. You can also prepend
-   them with an preffix like "frame_" e.g. frame_00.png, frame_01.png, etc.
+   them with a prefix like "frame_" e.g. frame_00.png, frame_01.png, etc.
 
 To further elaborate on the previous points, nameofthecharacter will be a directory named with the name of your character (prefer to use non-spaced lowercase names here).
 
@@ -291,10 +290,10 @@ tsto2rgb -c path/to/homer/ -o path/to/homer_assets/
 
 the following files will be created for each animation:
 
-* a bcell file for each animaton of that characater which file name will be made by concatenating  the character name with the animation subdirectory name. Take the animation "back_walk" from Homer. The resulting file will
+* a bcell file for each animaton of that characater which file name will be made by concatenating the character name with the animation subdirectory name. Take the animation "back_walk" from Homer. The resulting file will
   be called "homer_back_walk.bcell";
 
-* a xml file for each animation, where you can provide adjustments like offsets and delays between each frame. The nam of file will be the same as the ".bcell" file name, except that the extension will be ".xml".  For the previous example you would have "homer_back_walk.xml". For context here's how this file might look:
+* a xml file for each animation, where you can provide adjustments like offsets and delays between each frame. The name of file will be the same as the ".bcell" file name, except that the extension will be ".xml".  For the previous example you would have "homer_back_walk.xml". For context here's how this file might look:
 ```
 <AnimSequence offsetX="0" offsetY="0" depth="4">
   <Cell delay="41.666666666666664" />
@@ -305,10 +304,10 @@ the following files will be created for each animation:
 </AnimSequence>
 ```
 
-* a xml file for each character that lists each all those characters animations. For the previous the file would be named "homer.xml".
+* a xml file for each character that lists each of all those characters animations. For the previous the file would be named "homer.xml".
 
-The process after that is the analog to the one at the bsv3 section. You pack your new asset files for your character with a DLC,
-modify the gamescripts to load your new character, install them into your server DLC repository and check how they look in game.
+The process after that is analog to the one at the bsv3 section. You pack your new asset files for your character with a DLC,
+modify the gamescripts to load your new character, install them into your local DLC repository and check how they look in game.
 Then you adjust the offsets and delays for each animation, rerun tsto2rgb to recreate the bcell files, reinstall the DLC with the new files and verify again how they look.
 Do that until you end up with the desired results.
 
