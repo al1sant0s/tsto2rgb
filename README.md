@@ -143,7 +143,7 @@ Anyways, continuing with the brown house. Here's a screenshot of the Active subd
 Notice how the frames are numbered. That's a way to enforce their correct order as stated before. Now it's time to actually make those images into the required assets for an actual building. Confirming the structure above,
 here's how the files should be structured.
 
-<img width="817" height="301" alt="image" src="https://github.com/user-attachments/assets/044d8d25-01d0-41d3-8baf-df4e2aab8aac" />
+<img width="2050" height="1166" alt="Screenshot_20250923_145618" src="https://github.com/user-attachments/assets/1c8a8e62-51e7-4062-aa4a-b1f0f7c228f0" />
 
 All images here have the same dimensions: 758x601. 
 
@@ -169,7 +169,7 @@ The image data is located in the rgb and bsv3 files. The third file, called gene
 file, and for any new building you ever create a bsv3 asset for, it will look like this:
 
 ```
-<Building x="5" z="5" height="3.5" locX="1" locY="5" transImageX="0.0" transImageY="0.0" offsetX="0" offsetZ="0" depth="4" alpha="1.0" />
+<Building x="7" z="5" height="3.5" locX="3" locY="1" transImageX="0.0" transImageY="0.0" offsetX="0" offsetZ="0" depth="4" alpha="1.0" />
 ```
 
 Here you have several attributes. All attributes except the last 4 are used by the game.
@@ -177,33 +177,20 @@ OffsetX, offsetZ, depth and alpha are used by tsto2rgb itself.
 
 Before explaining this line of XML further let's see how the brown house looks in game with the new files. After doing the necessary modifications in gamescripts, I have used [tstodlc](https://github.com/al1sant0s/tstodlc/) to install the _4_70_NewHorizons_ DLC into my local gameserver DLC repository. Here's the _not really new_ brown house.
 
-<img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/7ac2d767-6b40-45ca-a1ca-e028fccccc93" />
+<img width="2050" height="1166" alt="Screenshot_20250923_143947" src="https://github.com/user-attachments/assets/df697654-9755-4a1b-b331-7099817214f8" />
 
-Not bad, right?! Let's see it in rearrange mode.
+It looks ok! Let's see it in rearrange mode.
 
-<img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/61358efe-7625-4f5b-9999-0cbc1dc2e0f2" />
+<img width="2050" height="1166" alt="Screenshot_20250923_143730" src="https://github.com/user-attachments/assets/5a8e7a12-0599-42e1-ae7b-b9a218d26ac5" />
 
-Two issues! First, the building itself doesn't lie over that green rectangle. The green rectangle represents the real position of the building, so the sprite should be drawn correctly above it.
-Also, you can clearly see how the green rectangle is not big enough to accommodate the whole brown house foundation.
+Two issues! First, the building itself doesn't lie over the green rectangle. The green rectangle represents the real position of the building, so the sprite should be drawn correctly above it.
+Also, you can clearly see how the green rectangle is not shaped correctly to accommodate the whole brown house foundation.
+To fix these issues, we need to edit 4 attributes in generichouse01.xml.
 
-> Before you say it's a square. Yes! I know it is a square. I'm referring to it as a rectangle because most of the time your building will have a rectangular shape. Also, a square is just a special case of a rectangle.
+Starting with the offsets. The attributes "offsetX" and "offsetZ" define offsets for the position where the sprite will be drawn.
+The offsets move the sprite according to the following image:
 
-To fix this, we need to edit 4 attributes in generichouse01.xml. The attributes "x" and "z" control the dimensions of the green rectangle, whereas "offsetX" and "offsetZ" define offsets for the position where the sprite will be drawn.
-Our mission here is to come up with the appropriate values for those 4 attributes so the building lies on a correctly sized green rectangle when selected in rearrange mode (the mode where you move buildings in game).
-
-Let's start by resizing the green rectangle. In this case, the adequate values are x="5" and z="7".
-
-```
-<Building x="5" z="7" height="3.5" locX="1" locY="5" transImageX="0.0" transImageY="0.0" offsetX="0" offsetZ="0" depth="4" alpha="1.0" />
-```
-and here's how it looks in game now
-
-<img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/d483445d-f34f-47de-8c3f-90b78ed9b5bf" />
-
-Much better, right?! Now, to fix the offsets by editing "offsetX" and "offsetZ" attributes so the house appears above the rectangle.
-Each offset attribute moves with positive values according to the following axes:
-
-<img width="2544" height="1385" alt="final_grid" src="https://github.com/user-attachments/assets/58b7543c-79ed-493b-b76e-506c5a81ef4f" />
+<img width="2663" height="1385" alt="grid01" src="https://github.com/user-attachments/assets/a605e257-a546-41ed-a908-24615c827091" />
 
 Unfortunately, guessing the correct values is done with trial and error. So at this point it's up to you to throw values in there, rerun the tsto2rgb command to remake the assets and reinstall the DLC with
 the new rgb/bsv3/xml files and check how they look in game. Rise and repeat until you end up with a desired result. Also when reruning tsto2rgb command it's quite important
@@ -212,12 +199,23 @@ that you point it to save to the same place where your current resulting rgb/bsv
 In this case, the following values did the trick.
 
 ```
-<Building x="5" z="7" height="3.5" locX="1" locY="5" transImageX="0.0" transImageY="0.0" offsetX="0.215" offsetZ="0.125" depth="4" alpha="1.0" />
+<Building x="7" z="5" height="3.5" locX="3" locY="1" transImageX="0.0" transImageY="0.0" offsetX="-0.91" offsetZ="0.59" depth="4" alpha="1.0" />
 ```
+
+<img width="2050" height="1166" alt="Screenshot_20250923_142541" src="https://github.com/user-attachments/assets/a5f765a5-bd6f-40dc-b777-b91484a5af9a" />
+
+Now, to fix the green rectangle dimensions we need to edit the attributes "x" and "z".
+
+For the brown house, the adequate values are x="5" and z="7".
+
+```
+<Building x="5" z="7" height="3.5" locX="1" locY="5" transImageX="0.0" transImageY="0.0" offsetX="-0.91" offsetZ="0.59" depth="4" alpha="1.0" />
+```
+<img width="2663" height="1385" alt="grid02" src="https://github.com/user-attachments/assets/3c06f07e-9393-49d2-97b7-a3df59bcc7e6" />
 
 and here's how it looks now
 
-<img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/7da00908-5252-451f-8a7e-fa3a87def700" />
+<img width="2050" height="1166" alt="Screenshot_20250923_144725" src="https://github.com/user-attachments/assets/a6fe88b2-104f-486c-bd3b-1bec73ab1bbc" />
 
 Perfect! Now just do this for any other building or decoration you have.
 
