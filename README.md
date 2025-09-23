@@ -114,8 +114,13 @@ The brown house bsv3 file from the game is structured like this (the animations 
 
 * generichouse01/
   * Active/
+     * 0.png
+     * 1.png
+     * ...rest of the image files...
   * Eggs/
+     * 0.png
   * Neutral/
+    * 0.png
 
 Without getting into too much detail, you will see:
 
