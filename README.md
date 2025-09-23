@@ -6,10 +6,12 @@ It uses [**ImageMagick**](https://imagemagick.org/) to perform the conversions a
 **Table of contents**
 
 * [Installation](https://github.com/al1sant0s/tsto2rgb?tab=readme-ov-file#installation)
-* [Basic usage](https://github.com/al1sant0s/tsto2rgb?tab=readme-ov-file#usage)
+* [Basic Usage](https://github.com/al1sant0s/tsto2rgb?tab=readme-ov-file#usage)
 * [rgb](https://github.com/al1sant0s/tsto2rgb?tab=readme-ov-file#making-rgb-assets)
 * [bsv3](https://github.com/al1sant0s/tsto2rgb?tab=readme-ov-file#making-bsv3-assets)
 * [bcell](https://github.com/al1sant0s/tsto2rgb?tab=readme-ov-file#making-bcell-assets)
+* [Grouping Images](https://github.com/al1sant0s/tsto2rgb?tab=readme-ov-file#grouping-images)
+* [Additional Options](https://github.com/al1sant0s/tsto2rgb?tab=readme-ov-file#additional-options)
 
 ## Installation
 
@@ -201,7 +203,7 @@ and here's how it looks in game now
 Much better, right?! Now, to fix the offsets by editing "offsetX" and "offsetZ" attributes so the house appears above the rectangle.
 Each offset attribute moves with positive values according to the following axes:
 
-<img width="2248" height="1385" alt="final_grid" src="https://github.com/user-attachments/assets/22727e17-5b1d-4ece-9126-4cbc07513438" />
+<img width="2544" height="1385" alt="final_grid" src="https://github.com/user-attachments/assets/58b7543c-79ed-493b-b76e-506c5a81ef4f" />
 
 Unfortunately, guessing the correct values is done with trial and error. So at this point it's up to you to throw values in there, rerun the tsto2rgb command to remake the assets and reinstall the DLC with
 the new rgb/bsv3/xml files and check how they look in game. Rise and repeat until you end up with a desired result. Also when reruning tsto2rgb command it's quite important
