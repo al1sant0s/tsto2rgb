@@ -31,11 +31,11 @@ def set_properties(directory, target, depth=4, alpha=1.0):
 
     # Get default values.
     defaults = {
-        "x": "5",
+        "x": "7",
         "z": "5",
         "height": "3.5",
-        "locX": "1",
-        "locY": "5",
+        "locX": "3",
+        "locY": "1",
         "transImageX": "0.0",
         "transImageY": "0.0",
         "offsetX": "0",
@@ -92,18 +92,19 @@ def dicer_parser(atlas_width, atlas_height, sprites, offsetX, offsetZ):
                 block = list()
                 cos = np.cos(27.5 * np.pi / 180)
                 sin = np.sin(27.5 * np.pi / 180)
-                matrix = np.array([[cos, sin], [-cos, sin]]).transpose()
+                matrix = np.array([[cos, -sin], [-cos, -sin]]).transpose()
                 offsets = np.array([offsetX, offsetZ])
                 pos = (
                     np.array([vertices[indices[i]]["x"], vertices[indices[i]]["y"]])
                     + np.matmul(
                         matrix,
                         np.array(
-                            [-frame["rect"]["width"] / 2, -frame["rect"]["height"] / 2]
+                            [frame["rect"]["width"]/2, frame["rect"]["height"]/2]
                         )
                         + offsets,
                     )
                 ) * 100
+
                 # x = vertices[indices[i]]["x"] * 100 + frame["rect"]["width"] * 100
                 # y = vertices[indices[i]]["y"] * 100 - frame["rect"]["height"] * 0
                 u1 = round(uvs[indices[i]]["u"] * atlas_width)
@@ -143,7 +144,7 @@ def bsv3_259(target, frames, cells, animations, alpha=1.0):
 
         # Write cellnames and positions.
         for i in range(len(cells)):
-            cellname = f"C_{target.stem}_{i:02d}"
+            cellname = f"C_{target.stem}_Crop_{i:02d}"
             cell = cells[i]
             x, y, w, h = cell
 
