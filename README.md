@@ -158,7 +158,6 @@ tsto2rgb -b Stage/generichouse01/ -o 4_70_NewHorizons/NewHorizons-BuildDecoGame-
 
 <img width="692" height="451" alt="image" src="https://github.com/user-attachments/assets/73e2c917-bbde-46c2-8d5c-336d54f237ea" />
 
-
 In this example, I'm saving the newly created assets into the directory of a custom DLC called _4_70_NewHorizons_. To actually see those assets in game, it's necessary to pack them as DLC and
 modify the gamescripts to load them. The way to do this is beyond the scope of this guide, so it will not be shown. The focus here is to show how to produce the assets and how to use tsto2rgb to modify the way they look in game.
 
@@ -176,7 +175,7 @@ file, and for any new building you ever create a bsv3 asset for, it will look li
 Here you have several attributes. All attributes except the last 4 are used by the game.
 OffsetX, offsetZ, depth and alpha are used by tsto2rgb itself.
 
-Before explaining this line of XML further let's see how the brown house looks in game with the new files. After doing the necessary modifications in gamescripts, I have used [tstodlc](https://github.com/al1sant0s/tstodlc/) to install the _4_70_NewHorizons_ DLC into my local gameserver DLC repository. Here's the _not really new_ brown house.
+Before explaining this line of XML further let's see how the brown house looks in game with the new files. After doing the necessary modifications in gamescripts, I have used [tstodlc](https://github.com/al1sant0s/tstodlc/) to install the _4_70_NewHorizons_ DLC into my local DLC repository. Here's the _not really new_ brown house.
 
 <img width="2050" height="1166" alt="Screenshot_20250923_143947" src="https://github.com/user-attachments/assets/df697654-9755-4a1b-b331-7099817214f8" />
 
