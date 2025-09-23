@@ -140,14 +140,10 @@ Anyways, continuing with the brown house. Here's a screenshot of the Active subd
 
 <img width="2050" height="1166" alt="Screenshot_20250920_193341" src="https://github.com/user-attachments/assets/c9218669-edf4-4a30-a5b4-37db70ba48ce" />
 
-Notice how the frames are numbered. That's a way to enforce their correct order as stated before. Now it's time to actually make those images into the required assets for an actual building. Confirming the structure above,
-here's how the files should be structured.
-
-<img width="2050" height="1166" alt="Screenshot_20250923_145618" src="https://github.com/user-attachments/assets/1c8a8e62-51e7-4062-aa4a-b1f0f7c228f0" />
-
+Notice how the frames are numbered. That's a way to enforce their correct order as stated before. Now it's time to actually make those images into the required assets for an actual building.
 All images here have the same dimensions: 758x601. 
 
-<img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/53b315f1-7f55-4c7a-90ca-74642656eeac" />
+<img width="2050" height="1166" alt="Screenshot_20250923_145618" src="https://github.com/user-attachments/assets/1c8a8e62-51e7-4062-aa4a-b1f0f7c228f0" />
 
 Now, with the following command I run, the corresponding rgb and bsv3 files will be made for the brown house. 
 
