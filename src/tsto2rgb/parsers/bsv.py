@@ -209,7 +209,7 @@ def bsv_parser(dicer_path, directory, building_definitions, target, offsetX, off
                 dicer_path,
                 "--square",
                 "-l",
-                "8192",
+                "2048",
                 "-o",
                 tempdir,
                 "-r",

@@ -4,13 +4,13 @@ build-backend = "hatchling.build"
 
 [project]
 name = "tsto2rgb"
-version = "0.0.4"
+version = "0.0.5"
 authors = [
   { name="al1sant0s", email="cnctalissonsantos@gmail.com" },
 ]
 description = "Convert images back to rgb files for The 'Simpsons: Tapped Out'."
 readme = "README.md"
-requires-python = ">=3.8"
+requires-python = ">=3.12"
 classifiers = [
     "Programming Language :: Python :: 3",
     "License :: OSI Approved :: MIT License",
