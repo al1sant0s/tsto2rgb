@@ -67,13 +67,19 @@ def rgb_gen(files, target, total, input_extension, depth):
     invalid_files = []
     for i in range(total):
         with Image(filename=files[i]) as main_img:
-            status = rgb_parser(main_img, Path(target, files[i].stem + ".rgb"), depth)
-            report_progress(
-                f" * Progress: {(i + 1) * 100 // total:3d}% -> {files[i].stem}.{input_extension}",
-                "",
-                styles["normal"],
-            )
-            if status is False:
-                invalid_files.append(files[i].name)
+            width = main_img.width + (main_img.width % 2 > 0)
+            height = main_img.height + (main_img.height % 2 > 0)
+
+            with Image(width=width, height=height) as new_img:
+                new_img.composite(main_img, 0, 0)
+
+                status = rgb_parser(new_img, Path(target, files[i].stem + ".rgb"), depth)
+                report_progress(
+                    f" * Progress: {(i + 1) * 100 // total:3d}% -> {files[i].stem}.{input_extension}",
+                    "",
+                    styles["normal"],
+                )
+                if status is False:
+                    invalid_files.append(files[i].name)
 
     generic_footer(styles["rgb"], total, invalid_files)
