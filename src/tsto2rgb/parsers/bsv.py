@@ -1,6 +1,7 @@
 import platform
 import json
 import os
+import shutil
 import subprocess
 import tempfile
 import numpy as np
@@ -26,8 +27,8 @@ def get_dicer_path():
     return next(dicer)
 
 
-def set_properties(directory, target, depth=4, alpha=1.0):
-    building_definitions = Path(target, directory.name + ".xml")
+def set_properties(directory, depth=4, alpha=1.0):
+    building_definitions = Path(directory, directory.name.lower() + ".xml")
 
     # Get default values.
     defaults = {
@@ -64,6 +65,7 @@ def set_properties(directory, target, depth=4, alpha=1.0):
 
 
 def dicer_parser(atlas_width, atlas_height, sprites, offsetX, offsetZ):
+
     with open(sprites, "r") as f:
         # Reorganize frames.
         data = json.load(f)
@@ -196,7 +198,7 @@ def bsv3_259(target, frames, cells, animations, alpha=1.0):
 #                        img.composite(clone, x, y)
 
 
-def bsv_parser(dicer_path, directory, building_definitions, target, offsetX, offsetZ, depth, alpha):
+def bsv_parser(dicer_path, directory, building_definitions, target):
     # First check if there are subdirectories there.
     subdirectories = [
         subdirectory
@@ -204,65 +206,131 @@ def bsv_parser(dicer_path, directory, building_definitions, target, offsetX, off
         if subdirectory.is_dir() is True
     ]
     if len(subdirectories) > 0:
-        with tempfile.TemporaryDirectory() as tempdir:
-            dicer_args = [
-                dicer_path,
-                "--square",
-                "-l",
-                "2048",
-                "-o",
-                tempdir,
-                "-r",
-            ]
-            # Call dicer.
-            status = subprocess.run(
-                dicer_args + [directory],
-                stdout=subprocess.DEVNULL,
-                stderr=subprocess.STDOUT,
-            ).returncode
-            if status == 0:
-                jsonfile = Path(tempdir, "sprites.json")
-                atlases = list(Path(tempdir).glob("*.png"))
-                if jsonfile.exists() is False:
-                    return (False, "sprites.json not created!")
-                elif len(atlases) == 0:
-                    return (False, "no atlas found!")
-                elif len(atlases) > 1:
-                    return (False, "too many atlases created!")
-                else:
-                    atlas = Path(tempdir, "atlas_0.png")
-                    sprites = Path(tempdir, "sprites.json")
 
-                    # Open atlas and rescale image if necessary.
-                    with Image(filename=atlas) as atlas_img:
-                        atlas_width = atlas_img.width
-                        atlas_height = atlas_img.height
 
-                        frames, cells, animations = dicer_parser(
-                            atlas_width,
-                            atlas_height,
-                            sprites,
-                            offsetX,
-                            offsetZ,
-                        )
-                        if (
-                            rgb_parser(
-                                atlas_img, Path(target, directory.name + ".rgb"), depth
+        # Load building definitions.
+        root = ET.parse(building_definitions).getroot()
+        offsetX = float(root.get("offsetX"))    # type: ignore
+        offsetZ = float(root.get("offsetZ"))    # type: ignore
+        depth = int(root.get("depth"))          # type: ignore
+        alpha = float(root.get("alpha"))        # type: ignore
+
+
+        for scale in (25, 50, 100):
+            with tempfile.TemporaryDirectory() as tempdir:
+
+                # Copy images to tempdir for rescaling them.
+                shutil.copytree(directory, Path(tempdir, directory.name))
+                temp_source = Path(tempdir, directory.name)
+
+                for image in temp_source.glob("**/*.png"):
+                    with Image(filename=image) as img:
+                        img.transform(resize = f"{scale}%")
+                        img.save(filename = image)
+
+
+                dicer_args = [
+                    dicer_path,
+                    "--square",
+                    "-l",
+                    "2048",
+                    "-o",
+                    tempdir,
+                    "-r",
+                ]
+                # Call dicer.
+                status = subprocess.run(
+                    dicer_args + [temp_source],
+                    stdout=subprocess.DEVNULL,
+                    stderr=subprocess.STDOUT,
+                ).returncode
+                if status == 0:
+                    jsonfile = Path(tempdir, "sprites.json")
+                    atlases = list(Path(tempdir).glob("*.png"))
+                    if jsonfile.exists() is False:
+                        return (False, "sprites.json not created!")
+                    elif len(atlases) == 0:
+                        return (False, "no atlas found!")
+                    elif len(atlases) > 1:
+                        return (False, "too many atlases created!")
+                    else:
+                        atlas = Path(tempdir, "atlas_0.png")
+                        sprites = Path(tempdir, "sprites.json")
+
+                        # Open atlas and rescale image if necessary.
+                        with Image(filename=atlas) as atlas_img:
+                            atlas_width = atlas_img.width
+                            atlas_height = atlas_img.height
+
+                            frames, cells, animations = dicer_parser(
+                                atlas_width,
+                                atlas_height,
+                                sprites,
+                                offsetX * scale / 100,
+                                offsetZ * scale / 100,
                             )
-                            is False
-                        ):
-                            return (False, "atlas conversion to rgb failed!")
-                        bsv3_259(
-                            Path(target, directory.name + ".bsv3"),
-                            frames,
-                            cells,
-                            animations,
-                            alpha,
-                        )
 
-                    return (True, "")
-            else:
-                return (False, "Dicer failed!")
+                            subtarget = Path(target, target.name.split("_")[-1] + f"BuildDecoGame-{scale}")
+                            subtarget.mkdir(exist_ok = True)
+
+                            if (
+                                rgb_parser(
+                                    atlas_img, Path(subtarget, directory.name.lower() + ".rgb"), depth
+                                )
+                                is False
+                            ):
+                                return (False, "atlas conversion to rgb failed!")
+                            bsv3_259(
+                                Path(subtarget, directory.name.lower() + ".bsv3"),
+                                frames,
+                                cells,
+                                animations,
+                                alpha,
+                            )
+
+                            tree = ET.ElementTree(ET.Element("Building", root.attrib))
+                            ET.indent(tree, "  ")
+                            with open(Path(subtarget, directory.name.lower() + ".xml"), "wb") as xml_file:
+                                tree.write(xml_file)
+
+
+                else:
+                    return (False, "Dicer failed!")
+
+        # Get additional images for the menus.
+        menu_img = Path(directory, "menu.png")
+        if menu_img.exists() is True:
+
+            with Image(filename = menu_img) as img:
+                subtarget = Path(target, target.name.split("_")[-1] + "Menu-ipad3")
+                subtarget.mkdir(exist_ok = True)
+                img.transform(resize = "100%")
+                rgb_parser(img, Path(subtarget, directory.name.lower() + "_menu.rgb"), 4)
+
+
+            with Image(filename = menu_img) as img:
+                subtarget = Path(target, target.name.split("_")[-1] + "Menu-retina")
+                subtarget.mkdir(exist_ok = True)
+                img.transform(resize = "50%")
+                rgb_parser(img, Path(subtarget, directory.name.lower() + "_menu.rgb"), 4)
+
+
+            with Image(filename = menu_img) as img:
+                subtarget = Path(target, target.name.split("_")[-1] + "Menu-ipad")
+                subtarget.mkdir(exist_ok = True)
+                img.transform(resize = "50%")
+                rgb_parser(img, Path(subtarget, directory.name.lower() + "_menu.rgb"), 4)
+
+
+            with Image(filename = menu_img) as img:
+                subtarget = Path(target, target.name.split("_")[-1] + "Menu-iphone")
+                subtarget.mkdir(exist_ok = True)
+                img.transform(resize = "25%")
+                rgb_parser(img, Path(subtarget, directory.name.lower() + "_menu.rgb"), 4)
+
+
+        return (True, "")
+
     else:
         return (False, "No animation subdirectories found!")
 
@@ -273,14 +341,13 @@ def bsv_gen(directories, target, total, input_extension, depth, alpha):
     invalid_directories = []
     for i in range(total):
         report_progress(
-            f" * Progress: {(i + 1) * 100 // total:3d}% -> {directories[i].stem}.bsv3",
+            f" * Progress: {(i + 1) * 100 // total:3d}% -> {directories[i].stem.lower()}.bsv3",
             "",
             styles["normal"],
         )
-        building_definitions = set_properties(directories[i], target, depth, alpha)
-        root = ET.parse(building_definitions).getroot()
+        building_definitions = set_properties(directories[i], depth, alpha)
         status, reason = bsv_parser(
-            get_dicer_path(), directories[i], building_definitions, target, float(root.get("offsetX")), float(root.get("offsetZ")), int(root.get("depth")), float(root.get("alpha")) # type: ignore
+            get_dicer_path(), directories[i], building_definitions, target
         )
         if status is False:
             invalid_directories.append(directories[i].name + f": {reason}")

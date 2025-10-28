@@ -17,6 +17,7 @@ def rgb_parser(main_img, target, depth):
             width = tmp_img.width
             height = tmp_img.height
 
+
             # Swap color channels for 4 bit depth.
             with Image() as rgb_img:
                 rgb_img.image_add(tmp_img.channel_images["blue"])  # type: ignore

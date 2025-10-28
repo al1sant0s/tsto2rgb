@@ -14,8 +14,8 @@ from tsto2rgb.tools import (
 )
 
 
-def set_properties(directory, target, num, delay, depth):
-    cell_definitions = Path(target, directory.parent.name + "_" + directory.name + ".xml")
+def set_properties(directory, num, delay, depth):
+    cell_definitions = Path(directory, directory.parent.name + "_" + directory.name.lower() + ".xml")
 
     # Get default values.
 
@@ -101,68 +101,107 @@ def bcell_gen(directories, target, total, input_extension, depth, delay):
         subdirectories = [subdirectory for subdirectory in directory.iterdir() if subdirectory.is_dir() is True]
         subtotal = len(subdirectories)
 
-        # Create animation file.
-        animlist = ET.Element("AnimList")
+        for scale in (25, 50, 100):
 
-        for i in range(subtotal):
+            # Create animation file.
+            animlist = ET.Element("AnimList")
 
-            img_list = natsorted(subdirectories[i].glob(f"*.{input_extension}"))
-            img_filter = list()
+            subtarget = Path(target, target.name.split("_")[-1] + f"Game-{scale}")
+            subtarget.mkdir(exist_ok = True)
 
-            cell_definitions = set_properties(subdirectories[i], target, len(img_list), delay, depth)
-            root = ET.parse(cell_definitions).getroot()
-            cells = [element for element in root.findall("*")]
+            for i in range(subtotal):
 
-            # Try to convert these images to rgb.
-            for img, cell in zip(img_list, cells):
-                with Image(filename=img) as main_img:
-                    width = main_img.width + (main_img.width % 2 > 0)
-                    height = main_img.height + (main_img.height % 2 > 0)
 
-                    with Image(width=width, height=height) as new_img:
-                        new_img.composite(main_img, 0, 0)
+                img_list = natsorted(subdirectories[i].glob(f"*.{input_extension}"))
+                img_filter = list()
 
-                        x = -new_img.width // 2 + int(root.attrib["offsetX"])
-                        y = -new_img.height + int(root.attrib["offsetY"])
-                        status = rgb_parser(
-                            new_img,
-                            Path(target, directory.name + "_" + subdirectories[i].name + f"_{img.stem}.rgb"),
-                            int(root.attrib["depth"]),
+                cell_definitions = set_properties(subdirectories[i], len(img_list), delay, depth)
+                root = ET.parse(cell_definitions).getroot()
+                cells = [element for element in root.findall("*")]
+
+                # Try to convert these images to rgb.
+                for img, cell in zip(img_list, cells):
+                    with Image(filename=img) as main_img:
+                        main_img.transform(resize = f"{scale}%")
+                        width = main_img.width + (main_img.width % 2 > 0)
+                        height = main_img.height + (main_img.height % 2 > 0)
+
+                        with Image(width=width, height=height) as new_img:
+                            new_img.composite(main_img, 0, 0)
+
+                            x = int(-new_img.width // 2 + int(root.attrib["offsetX"]) * scale / 100)
+                            y = int(-new_img.height + int(root.attrib["offsetY"]) * scale / 100)
+                            status = rgb_parser(
+                                new_img,
+                                Path(subtarget, directory.name.lower() + "_" + subdirectories[i].name.lower() + f"_{img.stem}.rgb"),
+                                int(root.attrib["depth"]),
+                            )
+
+                    if status is False:
+                        invalid_directories.append(
+                            img.relative_to(img.parent.parent).name + ": was not converted!"
                         )
+                    else:
+                        img_filter.append((img, float(cell.attrib["delay"]), x, y))
 
-                if status is False:
-                    invalid_directories.append(
-                        img.relative_to(img.parent.parent).name + ": was not converted!"
-                    )
-                else:
-                    img_filter.append((img, float(cell.attrib["delay"]), x, y))
-
-            status, reason = bcell_parser(
-                img_filter,
-                Path(target, directory.name + "_" + subdirectories[i].name + ".bcell"),
-            )
-            report_progress(
-                f" * Progress: {(i + 1) * 100 // subtotal:3d}% -> {directory.name + "_" + subdirectories[i].name}.bcell",
-                "",
-                styles["normal"],
-            )
-            if status is False:
-                invalid_directories.append(subdirectories[i].name + f": {reason}")
-            else:
-                ET.SubElement(
-                    animlist,
-                    "Animation",
-                    {
-                        "name":
-                        "_".join([s.capitalize() for s in subdirectories[i].name.split("_")])
-                    }
+                status, reason = bcell_parser(
+                    img_filter,
+                    Path(subtarget, directory.name.lower() + "_" + subdirectories[i].name.lower() + ".bcell"),
                 )
+                report_progress(
+                    f" * Progress: {(i + 1) * 100 // subtotal:3d}% -> {directory.name.lower() + "_" + subdirectories[i].name.lower()}.bcell",
+                    "",
+                    styles["normal"],
+                )
+                if status is False:
+                    invalid_directories.append(subdirectories[i].name + f": {reason}")
+                else:
+                    ET.SubElement(
+                        animlist,
+                        "Animation",
+                        {
+                            "name":
+                            "_".join([s.capitalize() for s in subdirectories[i].name.split("_")])
+                        }
+                    )
+
+                    tree = ET.ElementTree(animlist)
+                    ET.indent(tree, "  ")
+                    with open(Path(subtarget, directory.name.lower() + ".xml"), "wb") as xml_file:
+                        tree.write(xml_file)
 
 
-        tree = ET.ElementTree(animlist)
-        ET.indent(tree, "  ")
-        with open(Path(target, directory.name + ".xml"), "wb") as xml_file:
-            tree.write(xml_file)
+        # Get additional images for the menus.
+        menu_img = Path(directory, "menu.png")
+        if menu_img.exists() is True:
+
+            with Image(filename = menu_img) as img:
+                subtarget = Path(target, target.name.split("_")[-1] + "Menu-ipad3")
+                subtarget.mkdir(exist_ok = True)
+                img.transform(resize = "100%")
+                rgb_parser(img, Path(subtarget, directory.name.lower() + "_menu.rgb"), 4)
+
+
+            with Image(filename = menu_img) as img:
+                subtarget = Path(target, target.name.split("_")[-1] + "Menu-retina")
+                subtarget.mkdir(exist_ok = True)
+                img.transform(resize = "50%")
+                rgb_parser(img, Path(subtarget, directory.name.lower() + "_menu.rgb"), 4)
+
+
+            with Image(filename = menu_img) as img:
+                subtarget = Path(target, target.name.split("_")[-1] + "Menu-ipad")
+                subtarget.mkdir(exist_ok = True)
+                img.transform(resize = "50%")
+                rgb_parser(img, Path(subtarget, directory.name.lower() + "_menu.rgb"), 4)
+
+
+            with Image(filename = menu_img) as img:
+                subtarget = Path(target, target.name.split("_")[-1] + "Menu-iphone")
+                subtarget.mkdir(exist_ok = True)
+                img.transform(resize = "25%")
+                rgb_parser(img, Path(subtarget, directory.name.lower() + "_menu.rgb"), 4)
+
 
 
     generic_footer(styles["bcell"], total, invalid_directories)
