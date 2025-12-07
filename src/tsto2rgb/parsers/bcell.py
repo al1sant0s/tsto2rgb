@@ -123,19 +123,19 @@ def bcell_gen(directories, target, total, input_extension, depth, delay):
                 for img, cell in zip(img_list, cells):
                     with Image(filename=img) as main_img:
                         main_img.transform(resize = f"{scale}%")
-                        width = main_img.width + (main_img.width % 2 > 0)
-                        height = main_img.height + (main_img.height % 2 > 0)
+                        #width = main_img.width + (main_img.width % 2 > 0)
+                        #height = main_img.height + (main_img.height % 2 > 0)
 
-                        with Image(width=width, height=height) as new_img:
-                            new_img.composite(main_img, 0, 0)
+                        #with Image(width=width, height=height) as new_img:
+                        #    new_img.composite(main_img, 0, 0)
 
-                            x = int(-new_img.width // 2 + int(root.attrib["offsetX"]) * scale / 100)
-                            y = int(-new_img.height + int(root.attrib["offsetY"]) * scale / 100)
-                            status = rgb_parser(
-                                new_img,
-                                Path(subtarget, directory.name.lower() + "_" + subdirectories[i].name.lower() + f"_{img.stem}.rgb"),
-                                int(root.attrib["depth"]),
-                            )
+                        x = int(-main_img.width // 2 + int(root.attrib["offsetX"]) * scale / 100)
+                        y = int(-main_img.height + int(root.attrib["offsetY"]) * scale / 100)
+                        status = rgb_parser(
+                            main_img,
+                            Path(subtarget, directory.name.lower() + "_" + subdirectories[i].name.lower() + f"_{img.stem}.rgb"),
+                            int(root.attrib["depth"]),
+                        )
 
                     if status is False:
                         invalid_directories.append(

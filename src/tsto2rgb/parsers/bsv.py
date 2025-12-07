@@ -1,3 +1,4 @@
+from os.path import exists, isdir
 import platform
 import json
 import os
@@ -220,8 +221,10 @@ def bsv_parser(dicer_path, directory, building_definitions, target):
             with tempfile.TemporaryDirectory() as tempdir:
 
                 # Copy images to tempdir for rescaling them.
-                shutil.copytree(directory, Path(tempdir, directory.name))
                 temp_source = Path(tempdir, directory.name)
+                temp_source.mkdir(exist_ok = True)
+                for animation in subdirectories:
+                    shutil.copytree(animation, Path(temp_source, animation.name))
 
                 for image in temp_source.glob("**/*.png"):
                     with Image(filename=image) as img:
