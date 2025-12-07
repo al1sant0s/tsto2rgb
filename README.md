@@ -168,7 +168,25 @@ Here are the new files that were made for the brown house. Remember the resultin
 
 <img width="728" height="272" alt="image" src="https://github.com/user-attachments/assets/5b56c92a-511e-498b-a7a6-4201c8f1db6e" />
 
-The image data is located in the rgb and bsv3 files. The third file, called generichouse01.xml, is where to configure the building's characteristics. The default configuration of this
+These 3 files will be made for each tier (25, 50, 100). You can find them under the subdirectories bellow the output directory you specified in the call for the command.
+The image data is located in the rgb and bsv3 files. The third file, called generichouse01.xml, is where to configure the building's characteristics.
+
+> There is one important thing about the last file though. You will not edit the xml file under the output subdirectories. You will edit the xml file that was created
+under the input directory. For this example, after the last command has been executed, here it is how the directory structure of **generichouse01** looks like now
+>
+> * generichouse01/
+>  * Active/
+>     * 0.png
+>     * 1.png
+>     * ...rest of the image files...
+>  * Eggs/
+>     * 0.png
+>  * Neutral/
+>    * 0.png
+>  * **generichouse.xml**
+
+
+The default configuration of this
 file, and for any new building you ever create a bsv3 asset for, it will look like this:
 
 ```
@@ -209,8 +227,7 @@ The offsets move the sprite according to the following image:
 <img width="2663" height="1385" alt="grid01" src="https://github.com/user-attachments/assets/a605e257-a546-41ed-a908-24615c827091" />
 
 Unfortunately, guessing the correct values is done with trial and error. So at this point it's up to you to throw values in there, rerun the tsto2rgb command to remake the assets and reinstall the DLC with
-the new rgb/bsv3/xml files and check how they look in game. Rise and repeat until you end up with a desired result. Also when reruning tsto2rgb command it's quite important
-that you point it to save to the same place where your current resulting rgb/bsv3/xml files are because it will retrieve the offsets and other attributes from there and embed them into the newest bsv3 file.
+the new rgb/bsv3/xml files and check how they look in game. Rise and repeat until you end up with a desired result.
 
 In this case, the following values did the trick.
 
@@ -265,10 +282,13 @@ Beware that each directory you provide as an argument to -c option must:
          * 0.png
          * 1.png
          * ...rest of the image files...
-3. within each animation subdirectory only contain images that all share the same dimensions. This is quite an important point, and it's necessary to avoid your characters "wobbling"
+    * menu.png (optional)
+   
+3. only contain images that all share the same dimensions (except for the menu.png image, this one should have a smaller size to match the menu). This is quite an important point, and it's necessary to avoid your characters "wobbling"
    when their animations are shown in game.
 4. the images must be named in a way that they are listed in the correct order. You can simply name them with natural numbers if you wish. You can also prepend
    them with a prefix like "frame_" e.g. frame_00.png, frame_01.png, etc.
+5. The optional menu.png image must be named exactly like that. If included, the tool will create under the dlc output directory 4 subfolders with the menu rgb file, one for each tier (ipad, ipad3, retina, iphone).
 
 To further elaborate on the previous points, nameofthecharacter will be a directory named with the name of your character (prefer to use non-spaced lowercase names here).
 
@@ -301,27 +321,47 @@ For example, here's how Homer Simpson animations could be structured:
 That is a directoy named homer and within that directory you have all animations of that character. After running the command
 
 ```
-tsto2rgb -c path/to/homer/ -o path/to/homer_assets/
+tsto2rgb -c path/to/homer/ -o path/to/dlc_name/
 ```
 
-the following files will be created for each animation:
+the following files will be created:
+
+* rgb files for the frames;
 
 * a bcell file for each animaton of that characater which file name will be made by concatenating the character name with the animation subdirectory name. Take the animation "back_walk" from Homer. The resulting file will
   be called "homer_back_walk.bcell";
 
-* a xml file for each animation, where you can provide adjustments like offsets and delays between each frame. The name of file will be the same as the ".bcell" file name, except that the extension will be ".xml".  For the previous example you would have "homer_back_walk.xml". For context here's how this file might look:
-```
-<AnimSequence offsetX="0" offsetY="0" depth="4">
-  <Cell delay="41.666666666666664" />
-  <Cell delay="41.666666666666664" />
-  <Cell delay="41.666666666666664" />
-  <Cell delay="41.666666666666664" />
-  <Cell delay="41.666666666666664" />
-</AnimSequence>
-```
-
 * a xml file for each character that lists each of all those characters animations. For the previous the file would be named "homer.xml".
 
+* a xml file for each animation, where you can provide adjustments like offsets and delays between each frame. The name of file will be the same as the ".bcell" file name, except that the extension will be ".xml".
+  These files will be saved under the input subdirectories for further editing if necessary.
+
+  For the previous example you would have those new files.
+
+    * homer/
+      * back_walk/
+        * homer_back_walk.xml
+      * front_walk/
+        * homer_front_walk.xml
+      * idle/
+        * homer_idle.xml
+      * idle_blink/
+        * homer_idle_blink.xml
+      * pick_trash_active/
+        * homer_pick_trash_active.xml
+      * victory_pose/
+        * homer_victory_pose.xml
+  
+  For context here's how these files might look:
+  ```
+  <AnimSequence offsetX="0" offsetY="0" depth="4">
+    <Cell delay="41.666666666666664" />
+    <Cell delay="41.666666666666664" />
+    <Cell delay="41.666666666666664" />
+    <Cell delay="41.666666666666664" />
+    <Cell delay="41.666666666666664" />
+  </AnimSequence>
+  ```
 The process after that is analog to the one at the bsv3 section. You pack your new asset files for your character with a DLC,
 modify the gamescripts to load your new character, install them into your local DLC repository and check how they look in game.
 Then you adjust the offsets and delays for each animation, rerun tsto2rgb to recreate the bcell files, reinstall the DLC with the new files and verify again how they look.
