@@ -64,7 +64,7 @@ tsto2rgb --depth 8 -r path/to/images/ -o path/to/rgbs/
 Following the same logic as for making rgb, you will use --bsv [-b] option followed by a list of directories with your buildings, decorations, etc. As before, specify the output directory at the end of the command.
 
 ```
-tsto2rgb -b path/to/building01/ path/to/building02/ -o path/to/bsv3s/
+tsto2rgb -b path/to/building01/ path/to/building02/ -o path/to/dlc_name/
 ```
 
 Beware that each directory you provide as an argument to -b option must:
@@ -84,10 +84,13 @@ Beware that each directory you provide as an argument to -b option must:
          * 0.png
          * 1.png
          * ...rest of the image files...
-3. only contain images that all share the same dimensions. This is quite an important point, and it's necessary to avoid your buildings "wobbling"
+      * menu.png (optional)
+      
+3. only contain images that all share the same dimensions (except for the menu.png image, this one should have a smaller size to match the menu). This is quite an important point, and it's necessary to avoid your buildings "wobbling"
    when their animations are shown in game.
 4. the images must be named in a way that they are listed in the correct order. You can simply name them with natural numbers if you wish. You can also prepend
    them with a prefix like "frame_" e.g. frame_00.png, frame_01.png, etc.
+5. The optional menu.png image must be named exactly like that. If included, the tool will create under the dlc output directory 4 subfolders with the menu rgb file, one for each tier (ipad, ipad3, retina, iphone).
 
 To further elaborate on the previous points, nameofthebuilding will be a directory named with the name of your building (prefer to use non-spaced lowercase names here).
 Within the nameofthebuilding directory you should have subdirectories each corresponding to one animation (also called state) your building has.
@@ -102,6 +105,7 @@ Here's how you would structure your building:
 * brandnewbuilding/
   * Neutral/
     * 0.png
+  * menu.png (optional)
 
 So you have a directory named brandnewbuilding. Within that directory you have another directory called Neutral (because your building only has a neutral animation). Finally, you have all your images
 for that animation within the Neutral directory itself. In this specific example you would have just one frame that's named 0.png.
@@ -153,15 +157,14 @@ All images here have the same dimensions: 758x601.
 Now, with the following command I run, the corresponding rgb and bsv3 files will be made for the brown house. 
 
 ```
-tsto2rgb -b Stage/generichouse01/ -o 4_70_NewHorizons/NewHorizons-BuildDecoGame-100/
+tsto2rgb -b Stage/generichouse01/ -o 4_70_NewHorizons/
 ```
 
 <img width="692" height="451" alt="image" src="https://github.com/user-attachments/assets/73e2c917-bbde-46c2-8d5c-336d54f237ea" />
 
-In this example, I'm saving the newly created assets into the directory of a custom DLC called _4_70_NewHorizons_. To actually see those assets in game, it's necessary to pack them as DLC and
-modify the gamescripts to load them. The way to do this is beyond the scope of this guide, so it will not be shown. The focus here is to show how to produce the assets and how to use tsto2rgb to modify the way they look in game.
+In this example, I'm saving the newly created assets into the directory of a custom DLC called _4_70_NewHorizons_.
 
-With that said, here are the new files that were made for the brown house. Remember the resulting files will be saved in the directory you specify with the --output [-o] option:
+Here are the new files that were made for the brown house. Remember the resulting files will be saved in the subdirectories under the directory you specify with the --output [-o] option:
 
 <img width="728" height="272" alt="image" src="https://github.com/user-attachments/assets/5b56c92a-511e-498b-a7a6-4201c8f1db6e" />
 
@@ -175,7 +178,20 @@ file, and for any new building you ever create a bsv3 asset for, it will look li
 Here you have several attributes. All attributes except the last 4 are used by the game.
 OffsetX, offsetZ, depth and alpha are used by tsto2rgb itself.
 
-Before explaining this line of XML further let's see how the brown house looks in game with the new files. After doing the necessary modifications in gamescripts, I have used [tstodlc](https://github.com/al1sant0s/tstodlc/) to install the _4_70_NewHorizons_ DLC into my local DLC repository. Here's the _not really new_ brown house.
+Before explaining this line of XML further let's see how the brown house looks in game with the new files.
+To actually see those assets in game, it's necessary to pack them as DLC.
+You also need to modify the gamescripts to load them for a brand new building (but since the brown house is already registered in game, we don't need to to that). 
+
+I have used **tstodlc** to install the _4_70_NewHorizons_ assets DLC into my local DLC repository. In this case I have set priority to 3000 to override any exisintg assets from the brown house.
+
+```
+tstodlc -p3000 4_70_NewHorizons/ ~/Simpsons/dlc/
+```
+
+A full explanation of tstodlc is beyond the scope of this guide, so it will not be shown. The focus here is to show how to produce the assets and how to use tsto2rgb to modify the way they look in game.
+You can read more about it [here](https://github.com/al1sant0s/tstodlc/).
+
+Here's the _not really new_ brown house.
 
 <img width="2050" height="1166" alt="Screenshot_20250923_143947" src="https://github.com/user-attachments/assets/df697654-9755-4a1b-b331-7099817214f8" />
 
