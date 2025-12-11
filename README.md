@@ -461,11 +461,11 @@ tsto2rgb --depth 8 -r path/to/images/ -o path/to/rgbs/
 You can specify a default alpha with the --alpha [-a] option to use with the bsv3 files. The alpha must be a decimal number between 0.0 (fully transparent) and 1.0 (fully opaque).
 
 ```
-tsto2rgb -a 1.0 -r path/to/images/ -o path/bsv3s/
+tsto2rgb -a 1.0 -b path/to/images/ -o path/bsv3s/
 ```
 
 You can specify a default delay with the --delay [-d] option. The delay can be a decimal number and must be specified in milliseconds terms.
 
 ```
-tsto2rgb -d 41.68 -r path/to/images/ -o path/bcells/
+tsto2rgb -d 41.68 -c path/to/images/ -o path/bcells/
 ```
