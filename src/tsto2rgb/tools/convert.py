@@ -68,23 +68,47 @@ def main():
     parser.add_argument(
         "-r",
         "--rgb",
-        help="List of directories containing image files to be converted to rgb files.",
+        help="List of directories containing image files to be converted into rgb files.",
         nargs="+",
     )
+
+
+    parser.add_argument(
+        "-i",
+        "--icon",
+        help="""
+        List of directories containing image files to be converted into rgb files. This option will produce 4 variants of each image,
+        one for each tier which are: ipad3, ipad, retina and iphone.
+        """,
+        nargs="+",
+    )
+
+
+    parser.add_argument(
+        "-s",
+        "--splash",
+        help="""
+        List of directories containing image files to be converted into rgb files. This option will produce 3 variants of each image,
+        one for each tier of a splash which are: small, medium and large. It will also use 8 bit depth by default.
+        """,
+        nargs="+",
+    )
+
 
     parser.add_argument(
         "-b",
         "--bsv",
-        help="List of directories containing subdirectories containing image files to be converted to rgb and bsv3 files.",
+        help="List of directories containing subdirectories containing image files to be converted into rgb and bsv3 files.",
         nargs="+",
     )
 
     parser.add_argument(
         "-c",
         "--bcell",
-        help="List of directories containing subdirectories containing image files to be converted to rgb and bcell files.",
+        help="List of directories containing subdirectories containing image files to be converted into rgb and bcell files.",
         nargs="+",
     )
+
 
     parser.add_argument(
         "-o", "--output", help="Directory where results will be stored.", required=True
@@ -107,6 +131,23 @@ def main():
         Path(directory).glob(f"*.{args.input_extension}") for directory in rgb_files
     ]
     rgb_files = [file for glob in rgb_files for file in glob]
+
+
+    icon_files = (
+        [
+            Path(item).resolve()
+            for item in args.icon
+            if Path(item).resolve().is_dir() is True
+            and Path(item).resolve().name not in ("", ".", "..")
+        ]
+        if args.icon is not None
+        else []
+    )
+    icon_files = [
+        Path(directory).glob(f"*.{args.input_extension}") for directory in icon_files
+    ]
+    icon_files = [file for glob in icon_files for file in glob]
+
 
     bsv_directiores = (
         [
@@ -136,11 +177,12 @@ def main():
     # Get total of files to convert.
 
     rgb_total = len(rgb_files)
+    icon_total = len(icon_files)
     bsv_total = len(bsv_directiores)
     bcell_total = len(bcell_directiories)
 
     # Check if there's any work to do.
-    if rgb_total + bsv_total + bcell_total == 0:
+    if rgb_total + icon_total + bsv_total + bcell_total == 0:
         colorprint(styles["normal"], "\n\n [!] [No file(s) found!]\n\n")
         colorprint(
             styles["normal"],
@@ -157,10 +199,11 @@ def main():
         return
 
     # Procede with operation.
-    if rgb_total > 0:
+    if rgb_total + icon_total > 0:
         target = Path(args.output)
         target.mkdir(parents=True, exist_ok=True)
-        rgb_gen(rgb_files, target, rgb_total, args.input_extension, args.depth)
+        rgb_gen(rgb_files, icon_files, target, args.input_extension, args.depth)
+
 
     if bsv_total > 0:
         target = Path(args.output)

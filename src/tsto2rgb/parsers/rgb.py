@@ -73,20 +73,81 @@ def rgb_parser(main_img, target, depth):
         return False
 
 
-def rgb_gen(files, target, total, input_extension, depth):
+
+def make_icons(icon_img, target, filename):
+
+    status = True
+
+    with Image(image = icon_img) as img:
+        subtarget = Path(target, target.name.split("_")[-1] + "Menu-ipad3")
+        subtarget.mkdir(exist_ok = True)
+        status = status and rgb_parser(img, Path(subtarget, filename), 4)
+
+
+    with Image(image = icon_img) as img:
+        subtarget = Path(target, target.name.split("_")[-1] + "Menu-retina")
+        subtarget.mkdir(exist_ok = True)
+        img.resize(width = int(img.width * 2 / 3), height = int(img.height * 2 / 3))
+        status = status and rgb_parser(img, Path(subtarget, filename), 4)
+
+
+    with Image(image = icon_img) as img:
+        subtarget = Path(target, target.name.split("_")[-1] + "Menu-ipad")
+        subtarget.mkdir(exist_ok = True)
+        img.resize(width = int(img.width / 2), height = int(img.height / 2))
+        status = status and rgb_parser(img, Path(subtarget, filename), 4)
+
+
+    with Image(image = icon_img) as img:
+        subtarget = Path(target, target.name.split("_")[-1] + "Menu-iphone")
+        subtarget.mkdir(exist_ok = True)
+        img.resize(width = int(img.width * 1 / 3), height = int(img.height * 1 / 3))
+        status = status and rgb_parser(img, Path(subtarget, filename), 4)
+
+
+    return status
+
+
+def rgb_gen(rgb_files, icon_files, target, input_extension, depth):
+
+
+    rgb_total = len(rgb_files)
+    icon_total = len(icon_files)
+    splash_total = 0
+    total = rgb_total + icon_total + splash_total
+
     generic_header(styles["rgb"], "rgb", total, input_extension, depth)
     generic_body(styles["rgb"])
 
+
     invalid_files = []
-    for i in range(total):
-        with Image(filename=files[i]) as main_img:
-            status = rgb_parser(main_img, Path(target, files[i].stem + ".rgb"), depth)
+
+
+    # Normal rgb files.
+    for i in range(rgb_total):
+        with Image(filename=rgb_files[i]) as main_img:
+            status = rgb_parser(main_img, Path(target, rgb_files[i].stem + ".rgb"), depth)
             report_progress(
-                f" * Progress: {(i + 1) * 100 // total:3d}% -> {files[i].stem}.{input_extension}",
+                f" * Progress: {(i + 1) * 100 // rgb_total:3d}% -> {rgb_files[i].stem}.{input_extension}",
                 "",
                 styles["normal"],
             )
             if status is False:
-                invalid_files.append(files[i].name)
+                invalid_files.append(rgb_files[i].name)
+
+
+    # Icon files.
+    for i in range(icon_total):
+        with Image(filename=icon_files[i]) as icon_img:
+            status = make_icons(icon_img, target,  icon_files[i].stem + ".rgb")
+            report_progress(
+                f" * Progress: {(i + 1) * 100 // icon_total:3d}% -> {icon_files[i].stem}.{input_extension}",
+                "",
+                styles["normal"],
+            )
+            if status is False:
+                invalid_files.append(icon_files[i].name)
+
+
 
     generic_footer(styles["rgb"], total, invalid_files)

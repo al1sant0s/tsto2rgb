@@ -59,6 +59,28 @@ The example below uses depth 8, which is useful for creating splashscreen assets
 tsto2rgb --depth 8 -r path/to/images/ -o path/to/rgbs/
 ```
 
+
+#### Making icon assets
+
+To create menu icon assets, which are basically rgb assets which come in 4 tiers: ipad3, retina, ipad, iphone. Use the --icon [-i] option and
+provide a list of directories where the images you want to convert into rgb are located. After that, use the --output [-o] option and provide
+where the resulting files will be saved. 4 subfolders will be created within the directory specified under the --output argument. The name will be
+determined by the name of the output directory. Take the following command as an example:
+
+
+```
+tsto2rgb -r path/to/icons/ -o path/to/4_70_NewHorizons/
+```
+
+This will create the icon assets and save them in the following directories:
+
+* 4_70_NewHorizons:
+  * NewHorizonsMenu-ipad3/
+  * NewHorizonsMenu-retina/
+  * NewHorizonsMenu-ipad/
+  * NewHorizonsMenu-iphone/
+
+
 ### Making bsv3 assets
 
 Following the same logic as for making rgb, you will use --bsv [-b] option followed by a list of directories with your buildings, decorations, etc. As before, specify the output directory at the end of the command.
@@ -169,6 +191,18 @@ Here are the new files that were made for the brown house. Remember the resultin
 <img width="728" height="272" alt="image" src="https://github.com/user-attachments/assets/5b56c92a-511e-498b-a7a6-4201c8f1db6e" />
 
 These 3 files will be made for each tier (25, 50, 100). You can find them under the subdirectories bellow the output directory you specified in the call for the command.
+If menu.png image was also present, icons will be made for the 4 tiers (ipad3, retina, ipad and iphone).
+In the case of this particular example, the assets will be saved under the following subdirectories:
+
+* 4_70_NewHorizons:
+  * NewHorizonsBuildDecoGame-100/
+  * NewHorizonsBuildDecoGame-50/
+  * NewHorizonsBuildDecoGame-25/
+  * NewHorizonsMenu-ipad3/    (only if menu.png was present)
+  * NewHorizonsMenu-retina/   (only if menu.png was present)
+  * NewHorizonsMenu-ipad/     (only if menu.png was present)
+  * NewHorizonsMenu-iphone/   (only if menu.png was present)
+
 The image data is located in the rgb and bsv3 files. The third file, called generichouse01.xml, is where to configure the building's characteristics.
 
 > There is one important thing about the last file though. You will not edit the xml file under the output subdirectories. You will edit the xml file that was created
@@ -318,7 +352,7 @@ For example, here's how Homer Simpson animations could be structured:
   * pick_trash_active/
   * victory_pose/
 
-That is a directoy named homer and within that directory you have all animations of that character. After running the command
+That is a directory named homer and within that directory you have all animations of that character. After running the command
 
 ```
 tsto2rgb -c path/to/homer/ -o path/to/dlc_name/
@@ -366,6 +400,27 @@ The process after that is analog to the one at the bsv3 section. You pack your n
 modify the gamescripts to load your new character, install them into your local DLC repository and check how they look in game.
 Then you adjust the offsets and delays for each animation, rerun tsto2rgb to recreate the bcell files, reinstall the DLC with the new files and verify again how they look.
 Do that until you end up with the desired results.
+
+Consider the following example:
+
+```
+tsto2rgb -c path/to/homer/ -o path/to/_4_70_NewHorizons/
+```
+
+
+The files will be made for each tier (25, 50, 100). You can find them under the subdirectories bellow the output directory you specified in the call for the command.
+If menu.png image was also present, icons will be made for the 4 tiers (ipad3, retina, ipad and iphone).
+In the case of this particular example, the assets will be saved under the following subdirectories:
+
+* 4_70_NewHorizons:
+  * NewHorizonsGame-100/
+  * NewHorizonsGame-50/
+  * NewHorizonsGame-25/
+  * NewHorizonsMenu-ipad3/    (only if menu.png was present)
+  * NewHorizonsMenu-retina/   (only if menu.png was present)
+  * NewHorizonsMenu-ipad/     (only if menu.png was present)
+  * NewHorizonsMenu-iphone/   (only if menu.png was present)
+
 
 ### Grouping images
 

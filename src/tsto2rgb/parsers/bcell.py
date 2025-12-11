@@ -3,7 +3,7 @@ import xml.etree.ElementTree as ET
 from natsort import natsorted
 from wand.image import Image
 from pathlib import Path
-from tsto2rgb.parsers.rgb import rgb_parser
+from tsto2rgb.parsers.rgb import rgb_parser, make_icons
 from tsto2rgb.tools import (
     styles,
     generic_header,
@@ -174,34 +174,8 @@ def bcell_gen(directories, target, total, input_extension, depth, delay):
         # Get additional images for the menus.
         menu_img = Path(directory, "menu.png")
         if menu_img.exists() is True:
-
-            with Image(filename = menu_img) as img:
-                subtarget = Path(target, target.name.split("_")[-1] + "Menu-ipad3")
-                subtarget.mkdir(exist_ok = True)
-                img.transform(resize = "100%")
-                rgb_parser(img, Path(subtarget, directory.name.lower() + "_menu.rgb"), 4)
-
-
-            with Image(filename = menu_img) as img:
-                subtarget = Path(target, target.name.split("_")[-1] + "Menu-retina")
-                subtarget.mkdir(exist_ok = True)
-                img.transform(resize = "50%")
-                rgb_parser(img, Path(subtarget, directory.name.lower() + "_menu.rgb"), 4)
-
-
-            with Image(filename = menu_img) as img:
-                subtarget = Path(target, target.name.split("_")[-1] + "Menu-ipad")
-                subtarget.mkdir(exist_ok = True)
-                img.transform(resize = "50%")
-                rgb_parser(img, Path(subtarget, directory.name.lower() + "_menu.rgb"), 4)
-
-
-            with Image(filename = menu_img) as img:
-                subtarget = Path(target, target.name.split("_")[-1] + "Menu-iphone")
-                subtarget.mkdir(exist_ok = True)
-                img.transform(resize = "25%")
-                rgb_parser(img, Path(subtarget, directory.name.lower() + "_menu.rgb"), 4)
-
+            with Image(filename = menu_img) as icon_img:
+                make_icons(icon_img, target, directory.name.lower() + "_menu.rgb")
 
 
     generic_footer(styles["bcell"], total, invalid_directories)
