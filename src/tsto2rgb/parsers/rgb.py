@@ -74,32 +74,32 @@ def rgb_parser(main_img, target, depth):
 
 
 
-def make_icons(icon_img, target, filename):
+def make_icons(icon_img, target, prefix, filename):
 
     status = True
 
     with Image(image = icon_img) as img:
-        subtarget = Path(target, target.name.split("_")[-1] + "Menu-ipad3")
+        subtarget = Path(target, target.name.split("_")[-1] + prefix + "Menu-ipad3")
         subtarget.mkdir(exist_ok = True)
         status = status and rgb_parser(img, Path(subtarget, filename), 4)
 
 
     with Image(image = icon_img) as img:
-        subtarget = Path(target, target.name.split("_")[-1] + "Menu-retina")
+        subtarget = Path(target, target.name.split("_")[-1] + prefix + "Menu-retina")
         subtarget.mkdir(exist_ok = True)
         img.resize(width = int(img.width * 2 / 3), height = int(img.height * 2 / 3))
         status = status and rgb_parser(img, Path(subtarget, filename), 4)
 
 
     with Image(image = icon_img) as img:
-        subtarget = Path(target, target.name.split("_")[-1] + "Menu-ipad")
+        subtarget = Path(target, target.name.split("_")[-1] + prefix + "Menu-ipad")
         subtarget.mkdir(exist_ok = True)
         img.resize(width = int(img.width / 2), height = int(img.height / 2))
         status = status and rgb_parser(img, Path(subtarget, filename), 4)
 
 
     with Image(image = icon_img) as img:
-        subtarget = Path(target, target.name.split("_")[-1] + "Menu-iphone")
+        subtarget = Path(target, target.name.split("_")[-1] + prefix + "Menu-iphone")
         subtarget.mkdir(exist_ok = True)
         img.resize(width = int(img.width * 1 / 3), height = int(img.height * 1 / 3))
         status = status and rgb_parser(img, Path(subtarget, filename), 4)
@@ -139,7 +139,7 @@ def rgb_gen(rgb_files, icon_files, target, input_extension, depth):
     # Icon files.
     for i in range(icon_total):
         with Image(filename=icon_files[i]) as icon_img:
-            status = make_icons(icon_img, target,  icon_files[i].stem + ".rgb")
+            status = make_icons(icon_img, target,  "", icon_files[i].stem + ".rgb")
             report_progress(
                 f" * Progress: {(i + 1) * 100 // icon_total:3d}% -> {icon_files[i].stem}.{input_extension}",
                 "",

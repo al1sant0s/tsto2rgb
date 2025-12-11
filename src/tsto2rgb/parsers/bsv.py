@@ -304,7 +304,7 @@ def bsv_parser(dicer_path, directory, building_definitions, target):
         menu_img = Path(directory, "menu.png")
         if menu_img.exists() is True:
             with Image(filename = menu_img) as icon_img:
-                make_icons(icon_img, target, directory.name.lower() + "_menu.rgb")
+                make_icons(icon_img, target, "BuildDeco", directory.name.lower() + "_menu.rgb")
 
 
         return (True, "")

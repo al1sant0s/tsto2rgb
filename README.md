@@ -198,10 +198,10 @@ In the case of this particular example, the assets will be saved under the follo
   * NewHorizonsBuildDecoGame-100/
   * NewHorizonsBuildDecoGame-50/
   * NewHorizonsBuildDecoGame-25/
-  * NewHorizonsMenu-ipad3/    (only if menu.png was present)
-  * NewHorizonsMenu-retina/   (only if menu.png was present)
-  * NewHorizonsMenu-ipad/     (only if menu.png was present)
-  * NewHorizonsMenu-iphone/   (only if menu.png was present)
+  * NewHorizonsBuildDecoMenu-ipad3/    (only if menu.png was present)
+  * NewHorizonsBuildDecoMenu-retina/   (only if menu.png was present)
+  * NewHorizonsBuildDecoMenu-ipad/     (only if menu.png was present)
+  * NewHorizonsBuildDecoMenu-iphone/   (only if menu.png was present)
 
 The image data is located in the rgb and bsv3 files. The third file, called generichouse01.xml, is where to configure the building's characteristics.
 
