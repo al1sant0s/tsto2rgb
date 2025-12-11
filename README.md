@@ -62,7 +62,7 @@ tsto2rgb --depth 8 -r path/to/images/ -o path/to/rgbs/
 
 #### Making icon assets
 
-To create menu icon assets, which are basically rgb assets which come in 4 tiers: ipad3, retina, ipad, iphone. Use the --icon [-i] option and
+To create menu icon assets, which are basically rgb assets that come in 4 tiers: ipad3, retina, ipad, iphone. Use the --icon [-i] option and
 provide a list of directories where the images you want to convert into rgb are located. After that, use the --output [-o] option and provide
 where the resulting files will be saved. 4 subfolders will be created within the directory specified under the --output argument. The name will be
 determined by the name of the output directory. Take the following command as an example:
