@@ -70,7 +70,7 @@ def bcell_parser(img_list, target):
 
         for img, delay, x, y, frame_index in img_list:
             write_str_to_file(
-                f, str(img.parent.parent.name + "_" + img.parent.name + f"_image_{frame_index}.rgb").lower(), null_terminated=True
+                f, (img.parent.parent.name).capitalize() + "_" + "_".join(s.capitalize() for s in img.parent.name.split("_")) + f"_image_{frame_index}.rgb", null_terminated=True
             )
 
             # Write delay in miliseconds.
@@ -124,11 +124,6 @@ def bcell_gen(directories, target, total, input_extension, depth, delay):
                     img = img_list[j]
                     with Image(filename=img) as main_img:
                         main_img.transform(resize = f"{scale}%")
-                        #width = main_img.width + (main_img.width % 2 > 0)
-                        #height = main_img.height + (main_img.height % 2 > 0)
-
-                        #with Image(width=width, height=height) as new_img:
-                        #    new_img.composite(main_img, 0, 0)
 
                         x = int(-main_img.width // 2 + int(root.attrib["offsetX"]) * scale / 100)
                         y = int(-main_img.height + int(root.attrib["offsetY"]) * scale / 100)
