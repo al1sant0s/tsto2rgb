@@ -15,7 +15,7 @@ from tsto2rgb.tools import (
 
 
 def set_properties(directory, num, delay, depth):
-    cell_definitions = Path(directory, directory.parent.name + "_" + directory.name.lower() + ".xml")
+    cell_definitions = Path(directory, directory.parent.name.lower() + "_" + directory.name.lower() + ".xml")
 
     # Get default values.
 
@@ -68,9 +68,9 @@ def bcell_parser(img_list, target):
         # Number of images.
         f.write(len(img_list).to_bytes(2, "little"))
 
-        for img, delay, x, y in img_list:
+        for img, delay, x, y, frame_index in img_list:
             write_str_to_file(
-                f, img.parent.parent.name + "_" + img.parent.name + f"_{img.stem}.rgb", null_terminated=True
+                f, str(img.parent.parent.name + "_" + img.parent.name + f"_image_{frame_index}.rgb").lower(), null_terminated=True
             )
 
             # Write delay in miliseconds.
@@ -120,7 +120,8 @@ def bcell_gen(directories, target, total, input_extension, depth, delay):
                 cells = [element for element in root.findall("*")]
 
                 # Try to convert these images to rgb.
-                for img, cell in zip(img_list, cells):
+                for j, cell in zip(range(len(img_list)), cells):
+                    img = img_list[j]
                     with Image(filename=img) as main_img:
                         main_img.transform(resize = f"{scale}%")
                         #width = main_img.width + (main_img.width % 2 > 0)
@@ -133,7 +134,7 @@ def bcell_gen(directories, target, total, input_extension, depth, delay):
                         y = int(-main_img.height + int(root.attrib["offsetY"]) * scale / 100)
                         status = rgb_parser(
                             main_img,
-                            Path(subtarget, directory.name.lower() + "_" + subdirectories[i].name.lower() + f"_{img.stem}.rgb"),
+                            Path(subtarget, directory.name.lower() + "_" + subdirectories[i].name.lower() + f"_image_{j + 1}.rgb"),
                             int(root.attrib["depth"]),
                         )
 
@@ -142,7 +143,7 @@ def bcell_gen(directories, target, total, input_extension, depth, delay):
                             img.relative_to(img.parent.parent).name + ": was not converted!"
                         )
                     else:
-                        img_filter.append((img, float(cell.attrib["delay"]), x, y))
+                        img_filter.append((img, float(cell.attrib["delay"]), x, y, j + 1))
 
                 status, reason = bcell_parser(
                     img_filter,
