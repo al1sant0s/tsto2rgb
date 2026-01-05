@@ -64,138 +64,153 @@ def set_properties(directory, depth=4, alpha=1.0):
     return building_definitions
 
 
-def dicer_parser(atlas_width, atlas_height, sprites, offsetX, offsetZ):
+def dicer_parser(atlases_widths, atlases_heights, data, offsetX, offsetZ):
 
-    with open(sprites, "r") as f:
-        # Reorganize frames.
-        data = json.load(f)
+    # Organize frames with a dictonary.
+    data_dict = {item["id"]: item for item in data}
+    data_reorder = natsorted(anim for anim in data_dict.keys())
 
-        # Reoder with a dictonary.
-        data_dict = {item["id"]: item for item in data}
-        data_reorder = natsorted(anim for anim in data_dict.keys())
+    # List of ids, frames, cells and animations.
+    atlases_index = list()
+    frames = list()
+    cells_set = [set() for _ in range(len(atlases_widths))]
+    cells_list = [list() for _ in range(len(atlases_widths))]
+    animations = dict()
 
-        # List of cells, frames and animations.
-        cells_set = set()
-        cells_list = list()
-        frames = list()
-        animations = dict()
+    for state, index in zip(data_reorder, range(len(data_reorder))):
+        frame = data_dict[state]
+        animations[frame["id"].rsplit(os.sep, maxsplit=1)[0]] = index
+        blocks = list()
 
-        for state, index in zip(data_reorder, range(len(data_reorder))):
-            frame = data_dict[state]
-            animations[frame["id"].rsplit(os.sep, maxsplit=1)[0]] = index
-            blocks = list()
+        # Crop regions.
+        vertices = frame["vertices"]
+        uvs = frame["uvs"]
+        indices = frame["indices"]
+        atlas_index = frame["atlas"]
+        atlas_width = atlases_widths[atlas_index]
+        atlas_height = atlases_heights[atlas_index]
 
-            # Crop regions.
-            vertices = frame["vertices"]
-            uvs = frame["uvs"]
-            indices = frame["indices"]
-
-            for i in range(0, len(indices), 6):
-                block = list()
-                cos = np.cos(27.5 * np.pi / 180)
-                sin = np.sin(27.5 * np.pi / 180)
-                matrix = np.array([[cos, -sin], [-cos, -sin]]).transpose()
-                offsets = np.array([offsetX, offsetZ])
-                pos = (
-                    np.array([vertices[indices[i]]["x"], vertices[indices[i]]["y"]])
-                    + np.matmul(
-                        matrix,
-                        np.array(
-                            [frame["rect"]["width"]/2, frame["rect"]["height"]/2]
-                        )
-                        + offsets,
+        for i in range(0, len(indices), 6):
+            block = list()
+            cos = np.cos(27.5 * np.pi / 180)
+            sin = np.sin(27.5 * np.pi / 180)
+            matrix = np.array([[cos, -sin], [-cos, -sin]]).transpose()
+            offsets = np.array([offsetX, offsetZ])
+            pos = (
+                np.array([vertices[indices[i]]["x"], vertices[indices[i]]["y"]])
+                + np.matmul(
+                    matrix,
+                    np.array(
+                        [frame["rect"]["width"]/2, frame["rect"]["height"]/2]
                     )
-                ) * 100
+                    + offsets,
+                )
+            ) * 100
 
-                # x = vertices[indices[i]]["x"] * 100 + frame["rect"]["width"] * 100
-                # y = vertices[indices[i]]["y"] * 100 - frame["rect"]["height"] * 0
-                u1 = round(uvs[indices[i]]["u"] * atlas_width)
-                v1 = round(uvs[indices[i]]["v"] * atlas_height)
-                u2 = round(uvs[indices[i + 2]]["u"] * atlas_width)
-                v2 = round(uvs[indices[i + 2]]["v"] * atlas_height)
+            # x = vertices[indices[i]]["x"] * 100 + frame["rect"]["width"] * 100
+            # y = vertices[indices[i]]["y"] * 100 - frame["rect"]["height"] * 0
+            u1 = round(uvs[indices[i]]["u"] * atlas_width)
+            v1 = round(uvs[indices[i]]["v"] * atlas_height)
+            u2 = round(uvs[indices[i + 2]]["u"] * atlas_width)
+            v2 = round(uvs[indices[i + 2]]["v"] * atlas_height)
 
-                # Add cell only if new.
-                cell = (u1, v1, u2 - u1, v2 - v1)
-                cells_set.add(cell)
-                if len(cells_list) < len(cells_set):
-                    cells_list.append(cell)
+            # Add cell only if new.
+            cell = (u1, v1, u2 - u1, v2 - v1)
+            cells_set[atlas_index].add(cell)
+            if len(cells_list[atlas_index]) < len(cells_set[atlas_index]):
+                cells_list[atlas_index].append(cell)
 
-                # Add all info to the frame block.
-                block.append(cells_list.index(cell))
-                block.append(pos[0])
-                block.append(pos[1])
+            # Add all info to the frame block.
+            block.append(cells_list[atlas_index].index(cell))
+            block.append(pos[0])
+            block.append(pos[1])
 
-                blocks.append(block)
-
-            frames.append(blocks)
-        return (frames, cells_list, animations)
+            blocks.append(block)
 
 
-def bsv3_259(target, frames, cells, animations, alpha=1.0):
-    with open(target, "wb") as f:
-        # Write file signature.
-        f.write(b"\x03\x01")
+        atlases_index.append(frame["atlas"])
+        frames.append(blocks)
 
-        # Write cellnumber.
-        f.write(len(cells).to_bytes(2, "little"))
 
-        # Alpha flag.
-        alpha = int(alpha * 255)
-        alpha_flag = alpha < 255
-        f.write(alpha_flag.to_bytes())
+    return (atlases_index, frames, cells_list, animations)
 
-        # Write cellnames and positions.
-        for i in range(len(cells)):
-            cellname = f"C_{target.stem}_Crop_{i:02d}"
-            cell = cells[i]
-            x, y, w, h = cell
 
-            write_str_to_file(f, cellname, null_terminated=True)
+def bsv3_259(bsv_files, atlases_index, frames, cells, animations, alpha=1.0):
 
-            f.write(x.to_bytes(2, "little"))
-            f.write(y.to_bytes(2, "little"))
-            f.write(w.to_bytes(2, "little"))
-            f.write(h.to_bytes(2, "little"))
 
-        # Write frame data.
-        f.write(len(frames).to_bytes(2, "little"))
+    for i in range(len(bsv_files)):
 
-        for frame in frames:
-            # Block number.
-            f.write(len(frame).to_bytes(2, "little"))
+        target = bsv_files[i]
 
-            # Null byte.
-            f.write(b"\x00")
+        with open(target, "wb") as f:
+            # Write file signature.
+            f.write(b"\x03\x01")
 
-            for block in frame:
-                index, x, y = block
+            # Write cellnumber.
+            f.write(len(cells[i]).to_bytes(2, "little"))
 
-                pos_trans = np.array([x, y, 1, 0, 0, 1], dtype=np.float32)
+            # Alpha flag.
+            alpha = int(alpha * 255)
+            alpha_flag = alpha < 255
+            f.write(alpha_flag.to_bytes())
 
+            # Write cellnames and positions.
+            for j in range(len(cells[i])):
+                cellname = f"C_{target.stem}_Crop_{j:02d}"
+                cell = cells[i][j]
+                x, y, w, h = cell
+
+                write_str_to_file(f, cellname, null_terminated=True)
+
+                f.write(x.to_bytes(2, "little"))
+                f.write(y.to_bytes(2, "little"))
+                f.write(w.to_bytes(2, "little"))
+                f.write(h.to_bytes(2, "little"))
+
+            # Write frame data.
+            f.write(len(frames).to_bytes(2, "little"))
+
+            for frame, atlas_id in zip(frames, atlases_index):
+
+                # Block number.
+                if i == atlas_id:
+                    f.write(len(frame).to_bytes(2, "little"))
+
+                    # Null byte.
+                    f.write(b"\x00")
+
+                    for block in frame:
+                        index, x, y = block
+
+                        if index > len(cells[i]):
+                            continue
+
+                        pos_trans = np.array([x, y, 1, 0, 0, 1], dtype=np.float32)
+
+                        f.write(index.to_bytes(2, "little"))
+                        f.write(pos_trans.tobytes())
+                        if alpha_flag is True:
+                            f.write(int.to_bytes(alpha))
+
+                else:
+                    f.write(int.to_bytes(0, 3, "little"))
+
+
+            # Write animations.
+            f.write(len(animations).to_bytes(2, "little"))
+
+            last_index = 0
+            for name, index in zip(animations.keys(), animations.values()):
+                # Animation name.
+                write_str_to_file(f, name, null_terminated=True)
+
+                # First frame.
+                f.write(last_index.to_bytes(2, "little"))
+
+                # Last frame.
                 f.write(index.to_bytes(2, "little"))
-                f.write(pos_trans.tobytes())
-                if alpha_flag is True:
-                    f.write(int.to_bytes(alpha))
+                last_index = index + 1
 
-        # Write animations.
-        f.write(len(animations).to_bytes(2, "little"))
-
-        last_index = 0
-        for name, index in zip(animations.keys(), animations.values()):
-            # Animation name.
-            write_str_to_file(f, name, null_terminated=True)
-
-            # First frame.
-            f.write(last_index.to_bytes(2, "little"))
-
-            # Last frame.
-            f.write(index.to_bytes(2, "little"))
-            last_index = index + 1
-
-
-#                    with atlas_img.clone() as clone:
-#                        clone.crop(u1, v1, width=u2 - u1, height=v2 - v1)
-#                        img.composite(clone, x, y)
 
 
 def bsv_parser(dicer_path, directory, building_definitions, target):
@@ -225,10 +240,14 @@ def bsv_parser(dicer_path, directory, building_definitions, target):
                 for animation in subdirectories:
                     shutil.copytree(animation, Path(temp_source, animation.name))
 
-                for image in temp_source.glob("**/*.png"):
-                    with Image(filename=image) as img:
-                        img.transform(resize = f"{scale}%")
-                        img.save(filename = image)
+
+                for animation in temp_source.iterdir():
+                    images = natsorted(animation.glob("*.png"))
+                    for i in range(len(images)):
+                        with Image(filename = images[i]) as img:
+                            img.transform(resize = f"{scale}%")
+                            img.save(filename = Path(animation, f"{i}.png"))
+                        shutil.move(images[i], Path(animation, f"{i}.png"))
 
 
                 dicer_args = [
@@ -248,52 +267,74 @@ def bsv_parser(dicer_path, directory, building_definitions, target):
                 ).returncode
                 if status == 0:
                     jsonfile = Path(tempdir, "sprites.json")
-                    atlases = list(Path(tempdir).glob("*.png"))
+                    atlases = natsorted(list(Path(tempdir).glob("*.png")))
+                    atlases_number = len(atlases)
                     if jsonfile.exists() is False:
                         return (False, "sprites.json not created!")
-                    elif len(atlases) == 0:
+                    elif atlases_number == 0:
                         return (False, "no atlas found!")
-                    elif len(atlases) > 1:
-                        return (False, "too many atlases created!")
                     else:
-                        atlas = Path(tempdir, "atlas_0.png")
-                        sprites = Path(tempdir, "sprites.json")
+                        subtarget = Path(target, target.name.split("_")[-1] + f"BuildDecoGame-{scale}")
+                        subtarget.mkdir(exist_ok = True)
+                        neutral_atlas_index = 0
+                        atlases_widths = list()
+                        atlases_heights = list()
+                        data = dict()
 
-                        # Open atlas and rescale image if necessary.
-                        with Image(filename=atlas) as atlas_img:
-                            atlas_width = atlas_img.width
-                            atlas_height = atlas_img.height
+                        # Load json file.
+                        with open(jsonfile, "r") as jsonf:
+                            data = json.load(jsonf)
 
-                            frames, cells, animations = dicer_parser(
-                                atlas_width,
-                                atlas_height,
-                                sprites,
-                                offsetX * scale / 100,
-                                offsetZ * scale / 100,
-                            )
+                            # Attempt to find the 0 Neutral frame and make this atlas the main file (a file with a index number at the end).
+                            for item in data:
+                                if "neutral/0" in item.get("id", "").lower():
+                                    neutral_atlas_index = item["atlas"]
 
-                            subtarget = Path(target, target.name.split("_")[-1] + f"BuildDecoGame-{scale}")
-                            subtarget.mkdir(exist_ok = True)
 
-                            if (
-                                rgb_parser(
-                                    atlas_img, Path(subtarget, directory.name.lower() + ".rgb"), depth
-                                )
-                                is False
-                            ):
-                                return (False, "atlas conversion to rgb failed!")
-                            bsv3_259(
-                                Path(subtarget, directory.name.lower() + ".bsv3"),
-                                frames,
-                                cells,
-                                animations,
-                                alpha,
-                            )
 
-                            tree = ET.ElementTree(ET.Element("Building", root.attrib))
-                            ET.indent(tree, "  ")
-                            with open(Path(subtarget, directory.name.lower() + ".xml"), "wb") as xml_file:
-                                tree.write(xml_file)
+
+                        # Put the atlas with the netraul frame at the begging of list so it becomes the main file.
+                        rgb_files = [Path(subtarget, directory.name.lower() + ".rgb")] + [Path(subtarget, directory.name.lower() + f"_{index + 1}" + ".rgb") for index in range(atlases_number - 1)]
+                        rgb_files[0], rgb_files[neutral_atlas_index] = rgb_files[neutral_atlas_index], rgb_files[0]
+                        bsv_files = [Path(subtarget, rgb_file.stem + ".bsv3") for rgb_file in rgb_files]
+
+                        # Open atlases, get dimensions, rescale images if necessary and convert them to rgb.
+                        for i in range(atlases_number):
+                            atlas = atlases[i]
+                            with Image(filename=atlas) as atlas_img:
+                                atlases_widths.append(atlas_img.width)
+                                atlases_heights.append(atlas_img.height)
+
+                                if (
+                                    rgb_parser(
+                                        atlas_img, rgb_files[i], depth
+                                    )
+                                    is False
+                                ):
+                                    return (False, "atlas conversion to rgb failed!")
+
+
+                        atlases_index, frames, cells, animations = dicer_parser(
+                            atlases_widths,
+                            atlases_heights,
+                            data,
+                            offsetX * scale / 100,
+                            offsetZ * scale / 100,
+                        )
+
+                        bsv3_259(
+                            bsv_files,
+                            atlases_index,
+                            frames,
+                            cells,
+                            animations,
+                            alpha,
+                        )
+
+                        tree = ET.ElementTree(ET.Element("Building", root.attrib))
+                        ET.indent(tree, "  ")
+                        with open(Path(subtarget, directory.name.lower() + ".xml"), "wb") as xml_file:
+                            tree.write(xml_file)
 
 
                 else:
