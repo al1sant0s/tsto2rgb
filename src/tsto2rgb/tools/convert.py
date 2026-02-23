@@ -111,6 +111,19 @@ def main():
 
 
     parser.add_argument(
+        "--overlay",
+        help=
+        """
+        List of directories containing subdirectories containing image files to be converted into rgb and bsv3 files.
+        The difference between this option and --bsv3 is that this option produce bsv3 files for the tiers: ipad3, ipad, retina and iphone;
+        while --bsv3 produce bsv3 files for the tiers: 25, 50, 100. Also this will store in files in the normal menu subdirectories and not in
+        the BuildDecoMenu subdirectories.
+        """,
+        nargs="+",
+    )
+
+
+    parser.add_argument(
         "-o", "--output", help="Directory where results will be stored.", required=True
     )
 
@@ -160,6 +173,17 @@ def main():
         else []
     )
 
+    overlay_directiores = (
+        [
+            Path(item).resolve()
+            for item in args.overlay
+            if Path(item).resolve().is_dir() is True
+            and Path(item).resolve().name not in ("", ".", "..")
+        ]
+        if args.overlay is not None
+        else []
+    )
+
     bcell_directiories = (
         [
             Path(character).resolve()
@@ -179,10 +203,11 @@ def main():
     rgb_total = len(rgb_files)
     icon_total = len(icon_files)
     bsv_total = len(bsv_directiores)
+    overlay_total = len(overlay_directiores)
     bcell_total = len(bcell_directiories)
 
     # Check if there's any work to do.
-    if rgb_total + icon_total + bsv_total + bcell_total == 0:
+    if rgb_total + icon_total + bsv_total + overlay_total + bcell_total == 0:
         colorprint(styles["normal"], "\n\n [!] [No file(s) found!]\n\n")
         colorprint(
             styles["normal"],
@@ -205,16 +230,16 @@ def main():
         rgb_gen(rgb_files, icon_files, target, args.input_extension, args.depth)
 
 
-    if bsv_total > 0:
+    if bsv_total + overlay_total > 0:
         target = Path(args.output)
         target.mkdir(parents=True, exist_ok=True)
         bsv_gen(
             bsv_directiores,
+            overlay_directiores,
             target,
-            bsv_total,
             args.input_extension,
             args.depth,
-            args.alpha,
+            args.alpha
         )
 
     if bcell_total > 0:
