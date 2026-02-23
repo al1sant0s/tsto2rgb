@@ -385,7 +385,7 @@ def bsv_gen(bsv_directories, overlay_directories, target, input_extension, depth
         )
         building_definitions = set_properties(bsv_directories[i], depth, alpha)
         status, reason = bsv_parser(
-            get_dicer_path(), "64", "2048", bsv_directories[i], building_definitions, target, "BuildDecoGame", ("25", "50", "100")
+            get_dicer_path(), "64", "8192", bsv_directories[i], building_definitions, target, "BuildDecoGame", ("25", "50", "100")
         )
         if status is False:
             invalid_directories.append(bsv_directories[i].name + f": {reason}")
