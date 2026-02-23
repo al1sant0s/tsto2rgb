@@ -19,6 +19,16 @@ from tsto2rgb.tools import (
     report_progress,
 )
 
+TIERS_SCALES = {
+    "25": 1/4,
+    "50": 1/2,
+    "100": 1,
+    "ipad3": 1,
+    "retina": 2/3,
+    "ipad": 1/2,
+    "iphone": 1/3
+}
+
 
 def get_dicer_path():
     os_name = platform.system().lower()
@@ -137,7 +147,6 @@ def dicer_parser(atlases_widths, atlases_heights, data, offsetX, offsetZ):
 
 def bsv3_259(bsv_files, atlases_index, frames, cells, animations, alpha=1.0):
 
-
     for i in range(len(bsv_files)):
 
         target = bsv_files[i]
@@ -213,7 +222,7 @@ def bsv3_259(bsv_files, atlases_index, frames, cells, animations, alpha=1.0):
 
 
 
-def bsv_parser(dicer_path, directory, building_definitions, target):
+def bsv_parser(dicer_path, dicer_unit, atlas_limit, directory, building_definitions, target, subtarget_prefix, tiers):
     # First check if there are subdirectories there.
     subdirectories = [
         subdirectory
@@ -231,7 +240,7 @@ def bsv_parser(dicer_path, directory, building_definitions, target):
         alpha = float(root.get("alpha"))        # type: ignore
 
 
-        for scale in (25, 50, 100):
+        for tier in tiers:
             with tempfile.TemporaryDirectory() as tempdir:
 
                 # Copy images to tempdir for rescaling them.
@@ -245,7 +254,7 @@ def bsv_parser(dicer_path, directory, building_definitions, target):
                     images = natsorted(animation.glob("*.png"))
                     for i in range(len(images)):
                         with Image(filename = images[i]) as img:
-                            img.transform(resize = f"{scale}%")
+                            img.transform(resize = f"{TIERS_SCALES[tier] * 100}%")
                             img.save(filename = Path(animation, f"{i}.png"))
                         shutil.move(images[i], Path(animation, f"{i}.png"))
 
@@ -253,8 +262,10 @@ def bsv_parser(dicer_path, directory, building_definitions, target):
                 dicer_args = [
                     dicer_path,
                     "--square",
+                    "-s",
+                    "16",
                     "-l",
-                    "2048",
+                    atlas_limit,
                     "-o",
                     tempdir,
                     "-r",
@@ -274,7 +285,7 @@ def bsv_parser(dicer_path, directory, building_definitions, target):
                     elif atlases_number == 0:
                         return (False, "no atlas found!")
                     else:
-                        subtarget = Path(target, target.name.split("_")[-1] + f"BuildDecoGame-{scale}")
+                        subtarget = Path(target, target.name.split("_")[-1] + f"{subtarget_prefix}-{tier}")
                         subtarget.mkdir(exist_ok = True)
                         neutral_atlas_index = 0
                         atlases_widths = list()
@@ -318,8 +329,8 @@ def bsv_parser(dicer_path, directory, building_definitions, target):
                             atlases_widths,
                             atlases_heights,
                             data,
-                            offsetX * scale / 100,
-                            offsetZ * scale / 100,
+                            offsetX * TIERS_SCALES[tier],
+                            offsetZ * TIERS_SCALES[tier],
                         )
 
                         bsv3_259(
@@ -345,7 +356,7 @@ def bsv_parser(dicer_path, directory, building_definitions, target):
         menu_img = Path(directory, "menu.png")
         if menu_img.exists() is True:
             with Image(filename = menu_img) as icon_img:
-                make_icons(icon_img, target, "BuildDeco", directory.name.lower() + "_menu.rgb")
+                make_icons(icon_img, target, subtarget_prefix.removesuffix("Game"), directory.name.lower() + "_menu.rgb")
 
 
         return (True, "")
@@ -354,21 +365,44 @@ def bsv_parser(dicer_path, directory, building_definitions, target):
         return (False, "No animation subdirectories found!")
 
 
-def bsv_gen(directories, target, total, input_extension, depth, alpha):
+def bsv_gen(bsv_directories, overlay_directories, target, input_extension, depth, alpha):
+
+    bsv_total = len(bsv_directories)
+    overlay_total = len(overlay_directories)
+    total = bsv_total + overlay_total
+
     generic_header(styles["bsv"], "bsv", total, input_extension, depth)
     generic_body(styles["bsv"])
+
     invalid_directories = []
-    for i in range(total):
+
+    # For normal building/decoration directories.
+    for i in range(bsv_total):
         report_progress(
-            f" * Progress: {(i + 1) * 100 // total:3d}% -> {directories[i].stem.lower()}.bsv3",
+            f" * Progress: {(i + 1) * 100 // bsv_total:3d}% -> {bsv_directories[i].stem.lower()}.bsv3",
             "",
             styles["normal"],
         )
-        building_definitions = set_properties(directories[i], depth, alpha)
+        building_definitions = set_properties(bsv_directories[i], depth, alpha)
         status, reason = bsv_parser(
-            get_dicer_path(), directories[i], building_definitions, target
+            get_dicer_path(), "64", "2048", bsv_directories[i], building_definitions, target, "BuildDecoGame", ("25", "50", "100")
         )
         if status is False:
-            invalid_directories.append(directories[i].name + f": {reason}")
+            invalid_directories.append(bsv_directories[i].name + f": {reason}")
+
+
+    # For overlay directories.
+    for i in range(overlay_total):
+        report_progress(
+            f" * Progress: {(i + 1) * 100 // overlay_total:3d}% -> {overlay_directories[i].stem.lower()}.bsv3",
+            "",
+            styles["normal"],
+        )
+        building_definitions = set_properties(overlay_directories[i], depth, alpha)
+        status, reason = bsv_parser(
+            get_dicer_path(), "64", "8192", overlay_directories[i], building_definitions, target, "Menu", ("ipad3", "retina", "ipad", "iphone")
+        )
+        if status is False:
+            invalid_directories.append(overlay_directories[i].name + f": {reason}")
 
     generic_footer(styles["bsv"], total, invalid_directories)
