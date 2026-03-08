@@ -1,8 +1,10 @@
 import argparse
 from pathlib import Path
 from colorama import init
-from tsto2rgb.tools import styles, colorprint
-from tsto2rgb.parsers import rgb_gen, bsv_gen, bcell_gen
+from .styles import styles, colorprint
+from .rgb import rgb_gen
+from .bsv import bsv_gen
+from .bcell import bcell_gen
 
 
 # Warning: this script requires ImageMagick to work. If you do not have installed in your system,

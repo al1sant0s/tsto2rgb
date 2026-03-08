@@ -1,12 +1,7 @@
 from wand.image import Image
 from pathlib import Path
-from tsto2rgb.tools import (
-    styles,
-    generic_header,
-    generic_body,
-    generic_footer,
-    report_progress,
-)
+from .styles import styles, generic_header, generic_body, generic_footer
+from .misc import report_progress
 
 
 def rgb_parser(main_img, target, depth):
@@ -14,7 +9,6 @@ def rgb_parser(main_img, target, depth):
 
     if main_img.alpha_channel is False:
         main_img.alpha_channel = "opaque"
-
 
     if depth == 4:
 
@@ -74,35 +68,35 @@ def rgb_parser(main_img, target, depth):
 
 
 
-def make_icons(icon_img, target, prefix, filename):
+def make_icons(icon_img, target, prefix, filename, depth):
 
     status = True
 
     with Image(image = icon_img) as img:
         subtarget = Path(target, target.name.split("_")[-1] + prefix + "Menu-ipad3")
         subtarget.mkdir(exist_ok = True)
-        status = status and rgb_parser(img, Path(subtarget, filename), 4)
+        status = status and rgb_parser(img, Path(subtarget, filename), depth)
 
 
     with Image(image = icon_img) as img:
         subtarget = Path(target, target.name.split("_")[-1] + prefix + "Menu-retina")
         subtarget.mkdir(exist_ok = True)
         img.resize(width = int(img.width * 2 / 3), height = int(img.height * 2 / 3))
-        status = status and rgb_parser(img, Path(subtarget, filename), 4)
+        status = status and rgb_parser(img, Path(subtarget, filename), depth)
 
 
     with Image(image = icon_img) as img:
         subtarget = Path(target, target.name.split("_")[-1] + prefix + "Menu-ipad")
         subtarget.mkdir(exist_ok = True)
         img.resize(width = int(img.width / 2), height = int(img.height / 2))
-        status = status and rgb_parser(img, Path(subtarget, filename), 4)
+        status = status and rgb_parser(img, Path(subtarget, filename), depth)
 
 
     with Image(image = icon_img) as img:
         subtarget = Path(target, target.name.split("_")[-1] + prefix + "Menu-iphone")
         subtarget.mkdir(exist_ok = True)
         img.resize(width = int(img.width * 1 / 3), height = int(img.height * 1 / 3))
-        status = status and rgb_parser(img, Path(subtarget, filename), 4)
+        status = status and rgb_parser(img, Path(subtarget, filename), depth)
 
 
     return status
@@ -122,7 +116,6 @@ def rgb_gen(rgb_files, icon_files, target, input_extension, depth):
 
     invalid_files = []
 
-
     # Normal rgb files.
     for i in range(rgb_total):
         with Image(filename=rgb_files[i]) as main_img:
@@ -139,7 +132,7 @@ def rgb_gen(rgb_files, icon_files, target, input_extension, depth):
     # Icon files.
     for i in range(icon_total):
         with Image(filename=icon_files[i]) as icon_img:
-            status = make_icons(icon_img, target,  "", icon_files[i].stem + ".rgb")
+            status = make_icons(icon_img, target,  "", icon_files[i].stem + ".rgb", depth)
             report_progress(
                 f" * Progress: {(i + 1) * 100 // icon_total:3d}% -> {icon_files[i].stem}.{input_extension}",
                 "",

@@ -1,17 +1,13 @@
-import numpy as np
-import xml.etree.ElementTree as ET
 from natsort import natsorted
 from wand.image import Image
 from pathlib import Path
-from tsto2rgb.parsers.rgb import rgb_parser, make_icons
-from tsto2rgb.tools import (
-    styles,
-    generic_header,
-    generic_body,
-    generic_footer,
-    write_str_to_file,
-    report_progress,
-)
+from .styles import styles, generic_header, generic_body, generic_footer
+from .rgb import rgb_parser, make_icons
+from .misc import report_progress, write_str_to_file
+
+
+import numpy as np
+import xml.etree.ElementTree as ET
 
 
 def set_properties(directory, num, delay, depth):
@@ -171,7 +167,7 @@ def bcell_gen(directories, target, total, input_extension, depth, delay):
         menu_img = Path(directory, "menu.png")
         if menu_img.exists() is True:
             with Image(filename = menu_img) as icon_img:
-                make_icons(icon_img, target, "", directory.name.lower() + "_menu.rgb")
+                make_icons(icon_img, target, "", directory.name.lower() + "_menu.rgb", 4)
 
 
     generic_footer(styles["bcell"], total, invalid_directories)

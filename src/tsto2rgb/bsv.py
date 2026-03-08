@@ -1,3 +1,11 @@
+from natsort import natsorted
+from wand.image import Image
+from pathlib import Path
+from .styles import styles, generic_header, generic_body, generic_footer
+from .rgb import rgb_parser, make_icons
+from .misc import report_progress, write_str_to_file
+
+
 import platform
 import json
 import os
@@ -6,18 +14,7 @@ import subprocess
 import tempfile
 import numpy as np
 import xml.etree.ElementTree as ET
-from natsort import natsorted
-from wand.image import Image
-from pathlib import Path
-from tsto2rgb.parsers.rgb import rgb_parser, make_icons
-from tsto2rgb.tools import (
-    styles,
-    generic_header,
-    generic_body,
-    generic_footer,
-    write_str_to_file,
-    report_progress,
-)
+
 
 TIERS_SCALES = {
     "25": 1/4,

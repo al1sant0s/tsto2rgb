@@ -1,4 +1,4 @@
-from tsto2rgb.tools import colorprint
+from .styles import colorprint
 
 
 def write_str_to_file(file_descriptor, str_name, bytelen=1, null_terminated=False):

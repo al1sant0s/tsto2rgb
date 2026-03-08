@@ -1,4 +1,4 @@
-from tsto2rgb.parsers.styles import colorprint
+from .styles import colorprint
 
 def report_progress(prefix_str, parsing_info, style):
     # Clear line.
