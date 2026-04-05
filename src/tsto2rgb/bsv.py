@@ -260,7 +260,7 @@ def bsv_parser(dicer_path, dicer_unit, atlas_limit, directory, building_definiti
                     dicer_path,
                     "--square",
                     "-s",
-                    "16",
+                    dicer_unit,
                     "-l",
                     atlas_limit,
                     "-o",
@@ -353,7 +353,7 @@ def bsv_parser(dicer_path, dicer_unit, atlas_limit, directory, building_definiti
         menu_img = Path(directory, "menu.png")
         if menu_img.exists() is True:
             with Image(filename = menu_img) as icon_img:
-                make_icons(icon_img, target, subtarget_prefix.removesuffix("Game"), directory.name.lower() + "_menu.rgb")
+                make_icons(icon_img, target, subtarget_prefix.removesuffix("Game"), directory.name.lower() + "_menu.rgb", depth)
 
 
         return (True, "")
@@ -362,11 +362,12 @@ def bsv_parser(dicer_path, dicer_unit, atlas_limit, directory, building_definiti
         return (False, "No animation subdirectories found!")
 
 
-def bsv_gen(bsv_directories, overlay_directories, target, input_extension, depth, alpha):
+def bsv_gen(bsv_directories, overlay_directories, target, input_extension, depth, alpha, use_scale_tiers):
 
     bsv_total = len(bsv_directories)
     overlay_total = len(overlay_directories)
     total = bsv_total + overlay_total
+    tiers = [("ipad3", "retina", "ipad", "iphone"), ("25", "50", "100")]
 
     generic_header(styles["bsv"], "bsv", total, input_extension, depth)
     generic_body(styles["bsv"])
@@ -382,7 +383,7 @@ def bsv_gen(bsv_directories, overlay_directories, target, input_extension, depth
         )
         building_definitions = set_properties(bsv_directories[i], depth, alpha)
         status, reason = bsv_parser(
-            get_dicer_path(), "64", "8192", bsv_directories[i], building_definitions, target, "BuildDecoGame", ("25", "50", "100")
+            get_dicer_path(), "64", "8192", bsv_directories[i], building_definitions, target, "BuildDecoGame", tiers[1]
         )
         if status is False:
             invalid_directories.append(bsv_directories[i].name + f": {reason}")
@@ -397,7 +398,7 @@ def bsv_gen(bsv_directories, overlay_directories, target, input_extension, depth
         )
         building_definitions = set_properties(overlay_directories[i], depth, alpha)
         status, reason = bsv_parser(
-            get_dicer_path(), "64", "8192", overlay_directories[i], building_definitions, target, "Menu", ("ipad3", "retina", "ipad", "iphone")
+            get_dicer_path(), "64", "8192", overlay_directories[i], building_definitions, target, "Menu", tiers[use_scale_tiers]
         )
         if status is False:
             invalid_directories.append(overlay_directories[i].name + f": {reason}")

@@ -31,6 +31,16 @@ def main():
     )
 
     parser.add_argument(
+        "--use_scale_tiers",
+        help="""
+        If this option is enabled, --overlay will produce images in the scale tierlist (25, 50, 100).
+        Otherwise the device tierlist (ipad3, retina, ipad, iphone) will be used.
+        """,
+        action="store_true",
+    )
+
+
+    parser.add_argument(
         "--depth",
         help="Depth used for the image (choose between 4 and 8 bits per channel).",
         default=4,
@@ -123,7 +133,6 @@ def main():
         """,
         nargs="+",
     )
-
 
     parser.add_argument(
         "-o", "--output", help="Directory where results will be stored.", required=True
@@ -241,7 +250,8 @@ def main():
             target,
             args.input_extension,
             args.depth,
-            args.alpha
+            args.alpha,
+            args.use_scale_tiers
         )
 
     if bcell_total > 0:
@@ -253,7 +263,7 @@ def main():
             bcell_total,
             args.input_extension,
             args.depth,
-            args.delay,
+            args.delay
         )
 
     #    if total == 0:
