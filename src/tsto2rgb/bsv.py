@@ -240,20 +240,21 @@ def bsv_parser(dicer_path, dicer_unit, atlas_limit, directory, building_definiti
             with tempfile.TemporaryDirectory() as tempdir:
 
                 # Copy images to tempdir for rescaling them.
-                temp_source = Path(tempdir, directory.name)
-                temp_source.mkdir(exist_ok = True)
+                temp_source = Path(tempdir, "source")
+                temp_target = Path(tempdir, directory.name)
+                temp_source.mkdir(exist_ok=True)
+                temp_target.mkdir(exist_ok=True)
+
                 for animation in subdirectories:
                     shutil.copytree(animation, Path(temp_source, animation.name))
-
+                    Path(temp_target, animation.name).mkdir(exist_ok=True)
 
                 for animation in temp_source.iterdir():
                     images = natsorted(animation.glob("*.png"))
                     for i in range(len(images)):
                         with Image(filename = images[i]) as img:
                             img.transform(resize = f"{TIERS_SCALES[tier] * 100}%")
-                            img.save(filename = Path(animation, f"{i}.png"))
-                        shutil.move(images[i], Path(animation, f"{i}.png"))
-
+                            img.save(filename = Path(temp_target, animation.name, f"{i}.png"))
 
                 dicer_args = [
                     dicer_path,
@@ -268,7 +269,7 @@ def bsv_parser(dicer_path, dicer_unit, atlas_limit, directory, building_definiti
                 ]
                 # Call dicer.
                 status = subprocess.run(
-                    dicer_args + [temp_source],
+                    dicer_args + [temp_target],
                     stdout=subprocess.DEVNULL,
                     stderr=subprocess.STDOUT,
                 ).returncode
