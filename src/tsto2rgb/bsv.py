@@ -48,6 +48,8 @@ def set_properties(directory, depth=4, alpha=1.0):
         "transImageY": "0.0",
         "offsetX": "0",
         "offsetZ": "0",
+        "offsetH": "0",
+        "offsetV": "0",
         "depth": str(depth),
         "alpha": str(alpha)
     }
@@ -57,7 +59,7 @@ def set_properties(directory, depth=4, alpha=1.0):
         tree = ET.parse(building_definitions)
         root = tree.getroot()
 
-        for key, value in defaults.items():
+        for key, value in root.attrib.items():
             defaults[key] = root.get(key, value)
 
 
@@ -71,7 +73,7 @@ def set_properties(directory, depth=4, alpha=1.0):
     return building_definitions
 
 
-def dicer_parser(atlases_widths, atlases_heights, data, offsetX, offsetZ):
+def dicer_parser(atlases_widths, atlases_heights, data, offsetX, offsetZ, offsetH, offsetV):
 
     # Organize frames with a dictonary.
     data_dict = {item["id"]: item for item in data}
@@ -105,14 +107,9 @@ def dicer_parser(atlases_widths, atlases_heights, data, offsetX, offsetZ):
             offsets = np.array([offsetX, offsetZ])
             pos = (
                 np.array([vertices[indices[i]]["x"], vertices[indices[i]]["y"]])
-                + np.matmul(
-                    matrix,
-                    np.array(
-                        [frame["rect"]["width"]/2, frame["rect"]["height"]/2]
-                    )
-                    + offsets,
-                )
-            ) * 100
+                + np.matmul(matrix, offsets)
+                + np.array([offsetH, offsetV])
+            ) * 100 - np.array([frame["rect"]["width"]/2, frame["rect"]["height"]/2])
 
             # x = vertices[indices[i]]["x"] * 100 + frame["rect"]["width"] * 100
             # y = vertices[indices[i]]["y"] * 100 - frame["rect"]["height"] * 0
@@ -233,6 +230,8 @@ def bsv_parser(dicer_path, dicer_unit, atlas_limit, directory, building_definiti
         root = ET.parse(building_definitions).getroot()
         offsetX = float(root.get("offsetX"))    # type: ignore
         offsetZ = float(root.get("offsetZ"))    # type: ignore
+        offsetH = float(root.get("offsetH"))    # type: ignore
+        offsetV = float(root.get("offsetV"))    # type: ignore
         depth = int(root.get("depth"))          # type: ignore
         alpha = float(root.get("alpha"))        # type: ignore
 
@@ -328,6 +327,8 @@ def bsv_parser(dicer_path, dicer_unit, atlas_limit, directory, building_definiti
                             data,
                             offsetX * TIERS_SCALES[tier],
                             offsetZ * TIERS_SCALES[tier],
+                            offsetH * TIERS_SCALES[tier],
+                            offsetV * TIERS_SCALES[tier],
                         )
 
                         bsv3_259(
